@@ -50,11 +50,12 @@ import com.facebook.login.Login;
  * status bar and navigation/system bar) with user interaction.
  */
 public class WelcomeActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
+            Intent intent = new Intent(this,LoginActivity.class);
+            startActivity(intent);
     }
 }
 

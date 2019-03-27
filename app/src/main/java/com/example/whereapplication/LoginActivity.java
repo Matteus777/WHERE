@@ -58,14 +58,13 @@ public class LoginActivity extends AppCompatActivity {
         lgnFacebook.registerCallback(lgnCallBack, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                AccessToken accesstoken = loginResult.getAccessToken();
-                GraphRequest graphrequest = GraphRequest.newMeRequest(accesstoken, new GraphRequest.GraphJSONObjectCallback() {
+                String accesstoken = loginResult.getAccessToken().getToken();
+                GraphRequest graphrequest = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject object, GraphResponse response) {
                         try {
                             String userName = object.getString("name");
-                            Intent intent = new Intent(LoginActivity.this, ListActivity.class);
-                            startActivity(intent);
+                            Intent intent = new Intent(LoginActivity.this,ListActivity.class);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

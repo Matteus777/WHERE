@@ -19,11 +19,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".CellActivity"></activity>
         <activity android:name=".ListActivity" />
-        <activity
-            android:name=".WelcomeActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_welcome"
-            android:theme="@style/FullscreenTheme" />
+       <activity android:name=".LoginActivity"/>
         <activity
             android:name=".CodeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -51,7 +47,10 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity">
+        <activity android:name=".WelcomeActivity"
+                android:configChanges="orientation|keyboardHidden|screenSize"
+                android:label="@string/title_activity_welcome"
+                android:theme="@style/FullscreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
