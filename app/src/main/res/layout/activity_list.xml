@@ -1,30 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:background="@color/com_facebook_blue"
     android:layout_height="match_parent"
+    android:background="#"
+    android:orientation="vertical"
     tools:context=".ListActivity">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        android:background="#FFAA">
-    </android.support.v7.widget.Toolbar>
-
-
-    <ListView
+    <RelativeLayout
         android:id="@+id/lvEvents"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="200dp"
+        android:layout_margin="4dp"
+        android:background="#AAA">
 
-    </ListView>
 
-</LinearLayout>
+        <ImageView
+            android:id="@+id/imgEvent"
+            android:layout_width="160dp"
+            android:layout_height="200dp"
+            android:src="@drawable/ic_home_black_24dp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/txttitulo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="160dp"
+                android:gravity="center"
+                android:padding="2dp"
+                android:text="@string/txttitulo"
+                android:textSize="30dp" />
+
+            <TextView
+                android:id="@+id/txtdescricao"
+                android:layout_width="match_parent"
+                android:layout_height="109dp"
+                android:layout_marginLeft="160dp"
+                android:layout_marginTop="40dp"
+                android:padding="2dp"
+                android:text="Descricao"
+                android:textSize="20dp" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="165dp"
+                android:layout_marginTop="149dp"
+                android:padding="2dp">
+
+                <ImageButton
+                    android:id="@+id/imgbtnTag1"
+                    android:layout_width="70dp"
+                    android:layout_height="46dp"
+                    android:src="@drawable/iconfinder_price_tag_172526" />
+
+                <ImageButton
+                    android:id="@+id/imgbtnTag2"
+                    android:layout_width="70dp"
+                    android:layout_height="46dp"
+                    android:src="@drawable/iconfinder_price_tag_172526"
+                    android:layout_marginLeft="80dp"/>
+
+                <ImageButton
+                    android:id="@+id/imgbtnTag3"
+                    android:layout_width="70dp"
+                    android:layout_height="46dp"
+                    android:src="@drawable/iconfinder_price_tag_172526"
+                    android:layout_marginLeft="160dp"/>
+            </RelativeLayout>
+
+        </RelativeLayout>
+    </RelativeLayout>
+
+</RelativeLayout>
 
