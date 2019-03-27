@@ -4,9 +4,9 @@
     <string name="fb_login_protocol_scheme">fb371542457033860</string>
     <string name="fbLogin">Entrar com Facebook</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_about">Sobre</string>
+    <string name="title_logout">Sair</string>
+    <string name="title_favorite">Favoritos</string>
     <string name="title_activity_registration">RegistrationActivity</string>
 
     <string name="title_activity_code">CodeActivity</string>
