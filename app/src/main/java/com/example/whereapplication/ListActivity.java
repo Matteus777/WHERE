@@ -20,11 +20,6 @@ import java.util.List;
 
 
 public class ListActivity extends AppCompatActivity {
-    ListView lvEvents = (ListView) findViewById(R.id.lvEvents);
-    ArrayList<String> list = new ArrayList<>();
-    ArrayAdapter<String> lvAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
-    DatabaseReference dbReference;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +41,6 @@ public class ListActivity extends AppCompatActivity {
 //
 //
 //        tlb.setTitle("Lista de Eventos");
-
 
 //        lvEvents.setAdapter(lvAdapter);
 //        dbReference.addChildEventListener(new ChildEventListener() {

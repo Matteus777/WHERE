@@ -42,6 +42,8 @@ public class LoginActivity extends AppCompatActivity {
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks pCallBacks;
     private CallbackManager lgnCallBack;
     LoginButton lgnFacebook;
+    private String userName;
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         lgnCallBack.onActivityResult(requestCode,resultCode,data);
         super.onActivityResult(requestCode, resultCode, data);
@@ -60,13 +62,19 @@ public class LoginActivity extends AppCompatActivity {
                 GraphRequest graphrequest = GraphRequest.newMeRequest(accesstoken, new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject object, GraphResponse response) {
-                        Toast.makeText(LoginActivity.this,"WAD", Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(LoginActivity.this, ListActivity.class);
-                        startActivity(intent);
+                        try {
+                            String userName = object.getString("name");
+                            Intent intent = new Intent(LoginActivity.this, ListActivity.class);
+                            startActivity(intent);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
+
+
                 Bundle bundle = new Bundle();
-                bundle.putString("fields","id");
+                bundle.putString("fields","name");
                 graphrequest.setParameters(bundle);
                 graphrequest.executeAsync();
             }
@@ -79,6 +87,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onError(FacebookException error) {
             }
+
         });
 
 
@@ -92,6 +101,10 @@ public class LoginActivity extends AppCompatActivity {
     }
     private void displayData(JSONObject object){
 
+    }
+    public boolean isLoggedIn() {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        return accessToken != null;
     }
     private void requestLocationPermission() {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_CODE);
