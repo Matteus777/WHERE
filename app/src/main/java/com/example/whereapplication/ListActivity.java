@@ -20,19 +20,10 @@ import java.util.List;
 
 
 public class ListActivity extends AppCompatActivity {
-    ListView lvEvents = (ListView) findViewById(R.id.lvEvents);
-    ArrayList<String> list = new ArrayList<>();
-    ArrayAdapter<String> lvAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
-    DatabaseReference dbReference;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
-
-        android.support.v7.widget.Toolbar barra = findViewById(R.id.toolbar);
-        setSupportActionBar(barra);
-
 //        lvEvents.setAdapter(lvAdapter);
 //        dbReference.addChildEventListener(new ChildEventListener() {
 //            @Override
