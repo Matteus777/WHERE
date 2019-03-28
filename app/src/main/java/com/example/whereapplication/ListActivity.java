@@ -24,6 +24,23 @@ public class ListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_list);
+//        android.support.v7.widget.Toolbar tlb = findViewById(R.id.toolbarList);
+//        setSupportActionBar(tlb);
+
+
+
+//
+//        Toolbar tlb = findViewById(R.id.toolbarList);
+//
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setHomeButtonEnabled(true);
+//
+//
+//        tlb.setTitle("Lista de Eventos");
+
 //        lvEvents.setAdapter(lvAdapter);
 //        dbReference.addChildEventListener(new ChildEventListener() {
 //            @Override
