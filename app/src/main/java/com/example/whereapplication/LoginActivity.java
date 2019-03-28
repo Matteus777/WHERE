@@ -28,10 +28,13 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        Toast.makeText(LoginActivity.this, "99", Toast.LENGTH_SHORT).show();
         auth = FirebaseAuth.getInstance();
+        Toast.makeText(LoginActivity.this, "1", Toast.LENGTH_SHORT).show();
         authListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                Toast.makeText(LoginActivity.this, "2", Toast.LENGTH_SHORT).show();
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if(user!=null){
                     Toast.makeText(LoginActivity.this, "Logado", Toast.LENGTH_SHORT).show();
@@ -56,11 +59,11 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        auth.addAuthStateListener(authListener);
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        auth.addAuthStateListener(authListener);
+//    }
 
     @Override
     protected void onPause() {
