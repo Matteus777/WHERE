@@ -28,7 +28,6 @@
         <activity android:name=".CellActivity" />
         <activity android:name=".ListActivity" />
         <activity android:name=".WelcomeActivity" />
-        <activity android:name=".CodeActivity" />
         <activity android:name=".RegistrationActivity" />
 
         <meta-data
