@@ -23,16 +23,7 @@ import com.example.whereapplication.DAO.DAO;
 
 import com.example.whereapplication.Object.Event;
 import com.example.whereapplication.Object.Local;
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.login.Login;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
+
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
@@ -43,19 +34,17 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-import com.facebook.login.Login;
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
 public class WelcomeActivity extends AppCompatActivity {
+    Handler handler;
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+        protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
-            Intent intent = new Intent(this,LoginActivity.class);
-            startActivity(intent);
+        Intent intent = new Intent(WelcomeActivity.this,LoginActivity.class);
+                startActivity(intent);
+
+
     }
 }
 

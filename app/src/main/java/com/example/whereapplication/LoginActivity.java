@@ -1,113 +1,97 @@
 package com.example.whereapplication;
-import android.Manifest;
+
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.view.View;
 import android.widget.Toast;
 
-import com.example.whereapplication.DAO.DAO;
+import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
-import com.example.whereapplication.Object.Event;
-import com.example.whereapplication.Object.Local;
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.login.Login;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
-import com.google.firebase.FirebaseException;
-import com.google.firebase.auth.PhoneAuthCredential;
-import com.google.firebase.auth.PhoneAuthProvider;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
-import org.json.JSONObject;
-
+import java.util.Arrays;
 import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
-
-    private int LOCATION_PERMISSION_CODE = 1;
-
-
-    private PhoneAuthProvider.OnVerificationStateChangedCallbacks pCallBacks;
-    private CallbackManager lgnCallBack;
-    LoginButton lgnFacebook;
-    private String userName;
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        lgnCallBack.onActivityResult(requestCode,resultCode,data);
-        super.onActivityResult(requestCode, resultCode, data);
-    }
+    private FirebaseAuth auth;
+    private FirebaseAuth.AuthStateListener authListener;
+    final int RC_SIGN_IN = 123;
+    List<AuthUI.IdpConfig> providers = Arrays.asList(
+            new AuthUI.IdpConfig.PhoneBuilder().build(),
+            new AuthUI.IdpConfig.FacebookBuilder().build());
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        lgnFacebook = (LoginButton) findViewById(R.id.fbLogin);
-        lgnCallBack = CallbackManager.Factory.create();
-        lgnFacebook.setReadPermissions("public_profile");
-        lgnFacebook.registerCallback(lgnCallBack, new FacebookCallback<LoginResult>() {
+        auth = FirebaseAuth.getInstance();
+        authListener = new FirebaseAuth.AuthStateListener() {
             @Override
-            public void onSuccess(LoginResult loginResult) {
-                String accesstoken = loginResult.getAccessToken().getToken();
-                GraphRequest graphrequest = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(JSONObject object, GraphResponse response) {
-                        try {
-                            String userName = object.getString("name");
-                            Intent intent = new Intent(LoginActivity.this,ListActivity.class);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-
-
-                Bundle bundle = new Bundle();
-                bundle.putString("fields","name");
-                graphrequest.setParameters(bundle);
-                graphrequest.executeAsync();
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if(user!=null){
+                    Toast.makeText(LoginActivity.this, "Logado", Toast.LENGTH_SHORT).show();
+                }else{
+                    startActivityForResult(
+                            AuthUI.getInstance()
+                                    .createSignInIntentBuilder()
+                                    .setAvailableProviders(providers)
+                                    .setIsSmartLockEnabled(false)
+                                    .build(),
+                            RC_SIGN_IN);
+                }
             }
+        };
+        startActivityForResult(
+                AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(providers)
+                        .build(),
+                RC_SIGN_IN);
 
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        auth.addAuthStateListener(authListener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        auth.removeAuthStateListener(authListener);
+    }
+    public void signOut(View view){
+        AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
-            public void onCancel() {
-
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-            }
-
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(LoginActivity.this, "Usuario deslogado", Toast.LENGTH_SHORT).show();
+           finish(); }
         });
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
+        if (requestCode == RC_SIGN_IN) {
+            IdpResponse response = IdpResponse.fromResultIntent(data);
 
-
-        if (ContextCompat.checkSelfPermission(LoginActivity.this,
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-        } else {
-            requestLocationPermission();
+            if (resultCode == RESULT_OK) {
+                // Successfully signed in
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                // ...
+            } else {
+                // Sign in failed. If response is null the user canceled the
+                // sign-in flow using the back button. Otherwise check
+                // response.getError().getErrorCode() and handle the error.
+                // ...
+            }
         }
-
-    }
-    private void displayData(JSONObject object){
-
-    }
-    public boolean isLoggedIn() {
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        return accessToken != null;
-    }
-    private void requestLocationPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_CODE);
     }
 }
-
-
