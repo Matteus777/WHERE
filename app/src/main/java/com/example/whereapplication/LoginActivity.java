@@ -56,6 +56,8 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -84,7 +86,10 @@ public class LoginActivity extends AppCompatActivity {
 
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
+
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                Intent intent = new Intent(LoginActivity.this,ListActivity.class);
+                startActivity(intent);
                 // ...
             } else {
                 // Sign in failed. If response is null the user canceled the

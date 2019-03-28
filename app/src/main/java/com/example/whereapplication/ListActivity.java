@@ -24,9 +24,6 @@ public class ListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list);
 //        android.support.v7.widget.Toolbar tlb = findViewById(R.id.toolbarList);
 //        setSupportActionBar(tlb);
 
