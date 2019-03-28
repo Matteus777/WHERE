@@ -22,39 +22,45 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseAuth.AuthStateListener authListener;
     final int RC_SIGN_IN = 123;
+
     List<AuthUI.IdpConfig> providers = Arrays.asList(
             new AuthUI.IdpConfig.PhoneBuilder().build(),
             new AuthUI.IdpConfig.FacebookBuilder().build());
     AuthMethodPickerLayout customLayout = new AuthMethodPickerLayout
             .Builder(R.layout.activity_login)
             .setFacebookButtonId(R.id.fbButton)
-            .build();
+                .setPhoneButtonId(R.id.phoneButton)
+                .build();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        Toast.makeText(LoginActivity.this, "99", Toast.LENGTH_SHORT).show();
         auth = FirebaseAuth.getInstance();
-        Toast.makeText(LoginActivity.this, "1", Toast.LENGTH_SHORT).show();
         authListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                Toast.makeText(LoginActivity.this, "2", Toast.LENGTH_SHORT).show();
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if(user!=null){
                     Intent intent = new Intent(LoginActivity.this,ListActivity.class);
                     startActivity(intent);
                 }else{
-                    Toast.makeText(LoginActivity.this, "null", Toast.LENGTH_SHORT).show();
                     startActivityForResult(
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
                                     .setAvailableProviders(providers)
+                                    .setAuthMethodPickerLayout(customLayout)
                                     .build(),
                             RC_SIGN_IN);
                 }
             }
         };
+        startActivityForResult(
+                AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(providers)
+                        .setAuthMethodPickerLayout(customLayout)
+                        .build(),
+                RC_SIGN_IN);
     }
     @Override
     protected void onResume() {
