@@ -6,11 +6,28 @@ import java.util.Date;
 import java.util.UUID;
 
 public class Event {
+    private Local local;
+    public String getLocal() {
+        return local.getAddress();
+    }
+    public void setLocal(Local local) {
+        this.local = local;
+    }
     private String id;
     private double price;
     private String title;
     private Image photo;
     private Date date;
+    private String desc;
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
     private boolean tagopen;
     private boolean tagfree;
     private boolean tagshow;

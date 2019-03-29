@@ -4,4 +4,18 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="black_overlay">#66000000</color>
+    <color name="wherePink">#FFA9D3</color>
+    <color name="whereBlack">#212121</color>
+    <color name="whereWhite">#FFFFFF</color>
+
+    <style name="WhereTheme" parent="FirebaseUI">
+        <!-- Define as cores da tela de Login ae mongol -->
+        <item name="colorPrimary">@color/whereWhite</item>
+        <item name="colorPrimaryDark">@color/whereBlack</item>
+        <item name="colorAccent">@color/whereWhite</item>
+        <item name="colorControlNormal">@color/whereWhite</item>
+        <item name="colorControlActivated">@color/whereBlack</item>
+        <item name="colorControlHighlight">@color/whereWhite</item>
+        <item name="android:windowBackground">@color/whereWhite</item>
+    </style>
 </resources>

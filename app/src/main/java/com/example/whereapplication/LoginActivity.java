@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.whereapplication.DAO.DAO;
+import com.example.whereapplication.Object.Event;
 import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
@@ -14,6 +16,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,35 +25,34 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseAuth.AuthStateListener authListener;
     final int RC_SIGN_IN = 123;
+
     List<AuthUI.IdpConfig> providers = Arrays.asList(
             new AuthUI.IdpConfig.PhoneBuilder().build(),
             new AuthUI.IdpConfig.FacebookBuilder().build());
     AuthMethodPickerLayout customLayout = new AuthMethodPickerLayout
             .Builder(R.layout.activity_login)
             .setFacebookButtonId(R.id.fbButton)
-            .build();
+                .setPhoneButtonId(R.id.phoneButton)
+                .build();
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        Toast.makeText(LoginActivity.this, "99", Toast.LENGTH_SHORT).show();
-        auth = FirebaseAuth.getInstance();
-        Toast.makeText(LoginActivity.this, "1", Toast.LENGTH_SHORT).show();
+               auth = FirebaseAuth.getInstance();
         authListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                Toast.makeText(LoginActivity.this, "2", Toast.LENGTH_SHORT).show();
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if(user!=null){
                     Intent intent = new Intent(LoginActivity.this,ListActivity.class);
                     startActivity(intent);
                 }else{
-                    Toast.makeText(LoginActivity.this, "null", Toast.LENGTH_SHORT).show();
                     startActivityForResult(
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
                                     .setAvailableProviders(providers)
+                                    .setAuthMethodPickerLayout(customLayout)
                                     .build(),
                             RC_SIGN_IN);
                 }
