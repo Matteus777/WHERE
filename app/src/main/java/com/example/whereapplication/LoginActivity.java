@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -24,46 +25,44 @@ public class LoginActivity extends AppCompatActivity {
     List<AuthUI.IdpConfig> providers = Arrays.asList(
             new AuthUI.IdpConfig.PhoneBuilder().build(),
             new AuthUI.IdpConfig.FacebookBuilder().build());
+    AuthMethodPickerLayout customLayout = new AuthMethodPickerLayout
+            .Builder(R.layout.activity_login)
+            .setFacebookButtonId(R.id.fbButton)
+            .build();
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        Toast.makeText(LoginActivity.this, "99", Toast.LENGTH_SHORT).show();
         auth = FirebaseAuth.getInstance();
+        Toast.makeText(LoginActivity.this, "1", Toast.LENGTH_SHORT).show();
         authListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                Toast.makeText(LoginActivity.this, "2", Toast.LENGTH_SHORT).show();
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if(user!=null){
-                    Toast.makeText(LoginActivity.this, "Logado", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(LoginActivity.this,ListActivity.class);
+                    startActivity(intent);
                 }else{
+                    Toast.makeText(LoginActivity.this, "null", Toast.LENGTH_SHORT).show();
                     startActivityForResult(
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
                                     .setAvailableProviders(providers)
-                                    .setIsSmartLockEnabled(false)
                                     .build(),
                             RC_SIGN_IN);
                 }
             }
         };
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .build(),
-                RC_SIGN_IN);
-
-
     }
-
-
-
     @Override
     protected void onResume() {
         super.onResume();
         auth.addAuthStateListener(authListener);
     }
+
 
     @Override
     protected void onPause() {
@@ -84,19 +83,14 @@ public class LoginActivity extends AppCompatActivity {
 
         if (requestCode == RC_SIGN_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
-
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
-
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 Intent intent = new Intent(LoginActivity.this,ListActivity.class);
                 startActivity(intent);
                 // ...
             } else {
-                // Sign in failed. If response is null the user canceled the
-                // sign-in flow using the back button. Otherwise check
-                // response.getError().getErrorCode() and handle the error.
-                // ...
+
             }
         }
     }

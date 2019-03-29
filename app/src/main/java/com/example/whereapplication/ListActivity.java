@@ -8,6 +8,7 @@ import android.widget.Toolbar;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.example.whereapplication.Object.Event;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,6 +25,20 @@ public class ListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+
+        // --------- FREDERICO ------------//
+
+        ArrayAdapter<Event> EVENTS_LIST_ADAPTER = new ArrayAdapter<Event>(this, android.R.layout.simple_list_item_1, R.id.listEventos);
+
+        ListView listView = (ListView) findViewById(R.id.listEventos);
+        listView.setAdapter(EVENTS_LIST_ADAPTER);
+
+
+
+        // --------- Frederico ------------//
+
+
+
 //        android.support.v7.widget.Toolbar tlb = findViewById(R.id.toolbarList);
 //        setSupportActionBar(tlb);
 

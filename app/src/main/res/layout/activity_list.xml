@@ -87,6 +87,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="300dp"
         >
+    </RelativeLayout>
+    <ListView android:id="@+id/listEventos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="300dp">
         <ImageView
             android:layout_width="160dp"
             android:layout_height="171dp"
@@ -113,10 +118,10 @@
             android:orientation="horizontal"
             android:layout_marginLeft="160dp"
             android:layout_marginTop="143dp">
-        <ImageView
-            android:layout_width="60dp"
-            android:layout_height="28dp"
-            android:src="@drawable/iconfinder_price_tag_172526"/>
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="28dp"
+                android:src="@drawable/iconfinder_price_tag_172526"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="60dp"
@@ -151,7 +156,7 @@
                 android:layout_height="28dp"
                 android:src="@drawable/iconfinder_price_tag_172526"/>
         </LinearLayout>
-    </RelativeLayout>
+    </ListView>
 
 </RelativeLayout>
 
