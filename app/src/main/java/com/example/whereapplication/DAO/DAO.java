@@ -13,12 +13,11 @@ import java.util.UUID;
 public class DAO {
 
 
-    public static void insertEvent(Context context, FirebaseDatabase database, DatabaseReference dbReference, Event evento) {
+    public static void insertEvent(Context context, FirebaseDatabase database, DatabaseReference dbReference, Event event) {
         FirebaseApp.initializeApp(context);
         database = FirebaseDatabase.getInstance();
-        dbReference = database.getReference("event");
-        evento.setId(UUID.randomUUID().toString());
-        dbReference.setValue(evento);
+        event.setId(UUID.randomUUID().toString());
+        dbReference.child("event").child(event.getId()).setValue(event);
 
 
     }
@@ -30,6 +29,7 @@ public class DAO {
         dbReference = database.getReference("local");
         local.setId(UUID.randomUUID().toString());
         dbReference.setValue(local);
+
     }
 
 
