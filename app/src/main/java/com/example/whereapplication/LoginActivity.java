@@ -35,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
                 .setPhoneButtonId(R.id.phoneButton)
                 .build();
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);

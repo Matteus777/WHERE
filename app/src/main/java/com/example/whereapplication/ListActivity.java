@@ -11,7 +11,7 @@ import android.widget.Toast;
 import android.widget.Toolbar;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
+import com.example.whereapplication.Object.Event;
 import com.example.whereapplication.DAO.DAO;
 import com.example.whereapplication.Object.Event;
 import com.google.firebase.auth.FirebaseUser;
@@ -40,6 +40,33 @@ public class ListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+
+        // --------- FREDERICO ------------//
+
+        ArrayAdapter<Event> EVENTS_LIST_ADAPTER = new ArrayAdapter<Event>(this, android.R.layout.simple_list_item_1, R.id.listEventos);
+
+        ListView listView = (ListView) findViewById(R.id.listEventos);
+        listView.setAdapter(EVENTS_LIST_ADAPTER);
+
+
+
+        // --------- Frederico ------------//
+
+
+
+//        android.support.v7.widget.Toolbar tlb = findViewById(R.id.toolbarList);
+//        setSupportActionBar(tlb);
+
+
+
+//
+//        Toolbar tlb = findViewById(R.id.toolbarList);
+//
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setHomeButtonEnabled(true);
+//
+//
+//        tlb.setTitle("Lista de Eventos");
         dbReference = FirebaseDatabase.getInstance().getReference()
                 .child("posts");
     }
