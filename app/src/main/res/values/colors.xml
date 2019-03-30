@@ -13,6 +13,7 @@
         <item name="colorPrimary">@color/whereWhite</item>
         <item name="colorPrimaryDark">@color/whereBlack</item>
         <item name="colorAccent">@color/whereWhite</item>
+
         <item name="colorControlNormal">@color/whereWhite</item>
         <item name="colorControlActivated">@color/whereBlack</item>
         <item name="colorControlHighlight">@color/whereWhite</item>

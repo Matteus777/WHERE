@@ -42,11 +42,11 @@ public class ListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_list);
 
         // --------- FREDERICO ------------//
-
-        ArrayAdapter<Event> EVENTS_LIST_ADAPTER = new ArrayAdapter<Event>(this, android.R.layout.simple_list_item_1, R.id.listEventos);
-
-        ListView listView = (ListView) findViewById(R.id.listEventos);
-        listView.setAdapter(EVENTS_LIST_ADAPTER);
+//
+//        ArrayAdapter<Event> EVENTS_LIST_ADAPTER = new ArrayAdapter<Event>(this, android.R.layout.simple_list_item_1, R.id.listEventos);
+//
+//        ListView listView = (ListView) findViewById(R.id.listEventos);
+//        listView.setAdapter(EVENTS_LIST_ADAPTER);
 
 
 
