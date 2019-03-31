@@ -23,6 +23,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.example.whereapplication.DAO.DAO;
@@ -49,6 +50,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.List;
 
@@ -58,6 +60,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener authListener;
     final int RC_SIGN_IN = 123;
     final int USER_LOCATION = 1;
+    public String searchable;
     List<String> permissions = Arrays.asList("public_profile");
 
     List<AuthUI.IdpConfig> providers = Arrays.asList(
@@ -77,7 +80,10 @@ public class LoginActivity extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
+                    Bundle extra = new Bundle();
+                    extra.putString("location",searchable);
                     Intent intent = new Intent(LoginActivity.this, ListActivity.class);
+                    intent.putExtras(extra);
                     startActivity(intent);
                 }else {
                     startActivityForResult(
@@ -117,21 +123,24 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == RC_SIGN_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
 
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                Intent intent = new Intent(LoginActivity.this, ListActivity.class);
-                startActivity(intent);
                 // ...
             } else {
             }
+
+
         }
     }
-
+    public static String removeAccents(String str) {
+        str = Normalizer.normalize(str, Normalizer.Form.NFD);
+        str = str.replaceAll("[^\\p{ASCII}]", "");
+        return str;
+    }
     public void requestPermimssion() {
         int permissionCheck = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
@@ -157,14 +166,99 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             geocoder = new Geocoder(this);
             try {
-                String searchable;
+                String state;
                 user = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
                 lat = (double) user.get(0).getLatitude();
                 lng = (double) user.get(0).getLongitude();
                 city  = user.get(0).getSubAdminArea();
-                Log.i("logtest",user.get(1).toString());
+                state = user.get(0).getAdminArea();
+                Log.i("logtest",user.get(0).getAdminArea());
+                switch (state){
+                    case "Acre":
+                        state = "ac";
+                        break;
+                    case "Alagoas":
+                        state = "al";
+                        break;
+                    case "Amapá":
+                        state = "ap";
+                        break;
+                    case "Amazonas":
+                        state = "am";
+                        break;
+                    case "Bahia":
+                        state = "ba";
+                        break;
+                    case "Ceará":
+                        state = "ce";
+                        break;
+                    case "Distrito Federal":
+                        state = "df";
+                        break;
+                    case "Espírito Santo":
+                        state = "es";
+                        break;
+                    case "Goiás":
+                        state = "go";
+                        break;
+                    case "Maranhão":
+                        state = "ma";
+                        break;
+                    case "Mato Grosso":
+                        state = "mt";
+                        break;
+                    case "Mato Grosso do Sul":
+                        state = "ms";
+                        break;
+                    case "Minas Gerais":
+                        state = "mg";
+                        break;
+                    case "Pará":
+                        state = "pa";
+                        break;
+                    case "Paraíba":
+                        state = "pb";
+                        break;
+                    case "Paraná":
+                        state = "pr";
+                        break;
+                    case "Pernambuco":
+                        state ="pe";
+                        break;
+                    case "Piauí":
+                        state = "pi";
+                        break;
+                    case "Rio de Janeiro":
+                        state = "rj";
+                        break;
+                    case "Rio Grande do Norte":
+                        state = "rn";
+                        break;
+                    case "Rio Grande do Sul":
+                        state = "rs";
+                        break;
+                    case "Rondônia":
+                        state = "ro";
+                        break;
+                    case "Roraima":
+                        state = "rr";
+                        break;
+                    case "Santa Catarina":
+                        state = "sc";
+                        break;
+                    case "São Paulo":
+                        state = "sp";
+                        break;
+                    case "Sergipe":
+                        state = "se";
+                        break;
+                    case "Tocantins":
+                        state = "to";
+                            break;
+                }
 
-
+                searchable = city+"-"+state;
+                searchable = removeAccents(searchable);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -173,7 +267,7 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 //    private class Description extends AsyncTask<Void, Void, Void>{
-//        String desc;
+//        String url = "https://www.sympla.com.br/eventos/"+searchable;
 //
 //
 //        @Override
@@ -185,14 +279,16 @@ public class LoginActivity extends AppCompatActivity {
 //        protected Void doInBackground(Void... params) {
 //            try {
 //                // Connect to the web site
-//                Elements mBlogDocument = Jsoup.connect(url).get();
+//
+//
+//                DocumentsContract.Document event = Jsoup.connect(url).get();
 //                // Using Elements to get the Meta data
-//                Elements mElementDataSize = mBlogDocument.select("div[class=author-date]");
+//                Elements mElementDataSize = event.select("div[class=author-date]");
 //                // Locate the content attribute
 //                int mElementSize = mElementDataSize.size();
 //
 //                for (int i = 0; i < mElementSize; i++) {
-//                    Elements mElementAuthorName = mBlogDocument.select("span[class=vcard author post-author test]").select("a").eq(i);
+//                    DocumentsContract.Document mElementAuthorName = mBlogDocument.select("span[class=vcard author post-author test]").select("a").eq(i);
 //                    String mAuthorName = mElementAuthorName.text();
 //
 //                    Elements mElementBlogUploadDate = mBlogDocument.select("span[class=post-date updated]").eq(i);

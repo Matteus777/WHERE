@@ -1,5 +1,7 @@
 package com.example.whereapplication;
 
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +24,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
+import java.io.PrintWriter;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,10 +44,61 @@ public class ListActivity extends AppCompatActivity {
     TextView tvPrice;
     TextView tvDate;
     TextView tvAddress;
+    Bundle extras;
+    String location;
+    private ArrayList<String> eventNameList;
+    private ArrayList<String> eventDateList;
+    private ArrayList<String> eventLocationList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+        Intent intent = getIntent();
+        extras = intent.getExtras();
+        location = extras.getString("location");
+        new Description().execute();
+    }
+
+
+    public class Description extends AsyncTask<Void, Void, Void> {
+        String url = "https://www.sympla.com.br/eventos/" + location;
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+
+                Document doc = Jsoup.connect(url).get();
+                Elements eventGrid = doc.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
+                int gridSize = eventGrid.size();
+                for (int i = 0; i < gridSize; i++) {
+                    Elements eventNameDoc = doc.select("div[class=event-name]").select("p").eq(i);
+                    String eventName = eventNameDoc.text();
+                    Log.i("teste",eventName);
+                    Elements eventMonthDoc = doc.select("div[class=calendar-month]").eq(i);
+                    Elements eventDayDoc = doc.select("div[class=calendar-day]").eq(i);
+                    Elements eventTimeDoc = doc.select("div[class=line").eq(i);
+                    Log.i("teste",eventTimeDoc.toString());
+                    String eventDate = eventDayDoc.text() + "/" + eventMonthDoc.text() + " " + eventTimeDoc.text();
+
+                    Elements eventLocationDoc = doc.select("div[class=uperline case]").select("p").eq(i);
+                    String eventLocation = eventLocationDoc.text();
+                    eventNameList.add(eventName);
+                    eventDateList.add(eventDate);
+                    eventLocationList.add(eventLocation);
+
+                }
+            } catch (Exception e) {
+                e.getStackTrace();
+            }
+
+
+            return null;
+
+
+        }
+    }
+}
+
 
         // --------- FREDERICO ------------//
 //
@@ -49,14 +108,11 @@ public class ListActivity extends AppCompatActivity {
 //        listView.setAdapter(EVENTS_LIST_ADAPTER);
 
 
-
         // --------- Frederico ------------//
-
 
 
 //        android.support.v7.widget.Toolbar tlb = findViewById(R.id.toolbarList);
 //        setSupportActionBar(tlb);
-
 
 
 //
@@ -67,9 +123,9 @@ public class ListActivity extends AppCompatActivity {
 //
 //
 //        tlb.setTitle("Lista de Eventos");
-        dbReference = FirebaseDatabase.getInstance().getReference()
-                .child("posts");
-    }
+//        dbReference = FirebaseDatabase.getInstance().getReference()
+//                .child("posts");
+//    }
 
 //    @Override
 //    protected void onStart() {
@@ -97,7 +153,8 @@ public class ListActivity extends AppCompatActivity {
 //        };
 //        dbReference.addValueEventListener(eventListener);
 //    }
-}
+
+
 
 
 

@@ -17,7 +17,7 @@ public class Event {
     private double price;
     private String title;
     private Image photo;
-    private Date date;
+    private String date;
     private String desc;
 
     public String getDesc() {
@@ -65,11 +65,11 @@ public class Event {
         this.photo = photo;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 

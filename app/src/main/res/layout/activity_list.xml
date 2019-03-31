@@ -7,6 +7,5 @@
     android:orientation="vertical"
     tools:context=".ListActivity">
 
-
 </RelativeLayout>
 
