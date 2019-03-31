@@ -6,15 +6,9 @@ import java.util.Date;
 import java.util.UUID;
 
 public class Event {
-    private Local local;
-    public String getLocal() {
-        return local.getAddress();
-    }
-    public void setLocal(Local local) {
-        this.local = local;
-    }
+    private String local;
     private String id;
-    private double price;
+    private String price;
     private String title;
     private Image photo;
     private String date;
@@ -31,6 +25,15 @@ public class Event {
     private boolean tagopen;
     private boolean tagfree;
     private boolean tagshow;
+
+    public String getLocal() {
+        return local;
+    }
+
+    public void setLocal(String local) {
+        this.local = local;
+    }
+
     private boolean tagfesta;
 
     public String getId() {
@@ -41,11 +44,11 @@ public class Event {
         this.id = id;
     }
 
-    public double getPrice() {
+    public String getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(String price) {
         this.price = price;
     }
 

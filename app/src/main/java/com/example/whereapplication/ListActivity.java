@@ -9,10 +9,12 @@ import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.ThemedSpinnerAdapter;
 import android.widget.Toast;
 import android.widget.Toolbar;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
 import com.example.whereapplication.Object.Event;
 import com.example.whereapplication.DAO.DAO;
 import com.example.whereapplication.Object.Event;
@@ -24,15 +26,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
-
 
 
 public class ListActivity extends AppCompatActivity {
@@ -46,9 +49,6 @@ public class ListActivity extends AppCompatActivity {
     TextView tvAddress;
     Bundle extras;
     String location;
-    private ArrayList<String> eventNameList;
-    private ArrayList<String> eventDateList;
-    private ArrayList<String> eventLocationList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,47 +60,78 @@ public class ListActivity extends AppCompatActivity {
         new Description().execute();
     }
 
-
     public class Description extends AsyncTask<Void, Void, Void> {
-        String url = "https://www.sympla.com.br/eventos/" + location;
+        String eventLocation;
+        String eventName;
+        String eventDate;
+        String eventPrice;
+        Event event = new Event();
+        String cellUrl;
+
         @Override
         protected Void doInBackground(Void... voids) {
             try {
-
-                Document doc = Jsoup.connect(url).get();
-                Elements eventGrid = doc.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
-                int gridSize = eventGrid.size();
-                for (int i = 0; i < gridSize; i++) {
-                    Elements eventNameDoc = doc.select("div[class=event-name]").select("p").eq(i);
-                    String eventName = eventNameDoc.text();
-                    Log.i("teste",eventName);
-                    Elements eventMonthDoc = doc.select("div[class=calendar-month]").eq(i);
-                    Elements eventDayDoc = doc.select("div[class=calendar-day]").eq(i);
-                    Elements eventTimeDoc = doc.select("div[class=line").eq(i);
-                    Log.i("teste",eventTimeDoc.toString());
-                    String eventDate = eventDayDoc.text() + "/" + eventMonthDoc.text() + " " + eventTimeDoc.text();
-
-                    Elements eventLocationDoc = doc.select("div[class=uperline case]").select("p").eq(i);
-                    String eventLocation = eventLocationDoc.text();
-                    eventNameList.add(eventName);
-                    eventDateList.add(eventDate);
-                    eventLocationList.add(eventLocation);
-
+                for (int j = 0; j < 30; j++) {
+                    String url = "https://www.sympla.com.br/eventos/" + location + "?ordem=data&pagina=" + j;
+//              Log.i("teste","page"+j);
+                    final Document doc = Jsoup.connect(url).get();
+                    Elements ifExists = doc.normalise().select("h3[class=pull-left]");
+                    if (!ifExists.isEmpty()) {
+                        continue;
+                    }
+                    Elements eventGrid = doc.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
+                    final int gridSize = eventGrid.size();
+                    final int finalJ = j;
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (int i = 0; i < gridSize; i++) {
+                                Elements eventLocationDoc = doc.select("div[class=uppercase line]").select("p").eq(i);
+                                eventLocation = eventLocationDoc.text();
+                                Elements eventNameDoc = doc.select("div[class=event-name]").select("p").eq(i);
+                                eventName = eventNameDoc.text();
+                                Elements eventMonthDoc = doc.select("div[class=calendar-month]").eq(i);
+                                Elements eventDayDoc = doc.select("div[class=calendar-day]").eq(i);
+                                Elements eventTimeDoc = doc.normalise().select("div[class=line]").not("i").eq(i);
+                                eventDate = eventDayDoc.text() + "/" + eventMonthDoc.text() + " " + eventTimeDoc.text();
+                                event.setDate(eventDate);
+                                event.setLocal(eventLocation);
+                                event.setTitle(eventName);
+//                                Log.i("teste","event"+ finalJ);
+                            }
+                        }
+                    }).start();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                for (int i = 0; i < gridSize; i++) {
+                                    cellUrl = doc.select("a.event-box-link").eq(i).attr("href");
+                                    Document eventCell = Jsoup.connect(cellUrl).get();
+                                    Elements eventPriceDoc = eventCell.select("tbody");
+                                    eventPrice = eventPriceDoc.text();
+                                    event.setPrice(eventPrice);
+                                    Log.i("teste","price"+ finalJ);
+                                }
+                            } catch (Exception e) {
+                                e.getStackTrace();
+                            }
+                        }
+                    }).start();
                 }
             } catch (Exception e) {
                 e.getStackTrace();
             }
-
-
             return null;
-
-
         }
     }
 }
 
 
-        // --------- FREDERICO ------------//
+
+
+
+// --------- FREDERICO ------------//
 //
 //        ArrayAdapter<Event> EVENTS_LIST_ADAPTER = new ArrayAdapter<Event>(this, android.R.layout.simple_list_item_1, R.id.listEventos);
 //
@@ -108,7 +139,7 @@ public class ListActivity extends AppCompatActivity {
 //        listView.setAdapter(EVENTS_LIST_ADAPTER);
 
 
-        // --------- Frederico ------------//
+// --------- Frederico ------------//
 
 
 //        android.support.v7.widget.Toolbar tlb = findViewById(R.id.toolbarList);
@@ -153,9 +184,3 @@ public class ListActivity extends AppCompatActivity {
 //        };
 //        dbReference.addValueEventListener(eventListener);
 //    }
-
-
-
-
-
-

@@ -67,6 +67,7 @@ public class LoginActivity extends AppCompatActivity {
             new AuthUI.IdpConfig.PhoneBuilder().build(),
             new AuthUI.IdpConfig.FacebookBuilder().setPermissions(permissions).build());
     public String city;
+    public String notEventFilter;
 
     @Override
 
@@ -82,6 +83,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (user != null) {
                     Bundle extra = new Bundle();
                     extra.putString("location",searchable);
+                    extra.putString("city",notEventFilter);
                     Intent intent = new Intent(LoginActivity.this, ListActivity.class);
                     intent.putExtras(extra);
                     startActivity(intent);
@@ -256,7 +258,8 @@ public class LoginActivity extends AppCompatActivity {
                         state = "to";
                             break;
                 }
-
+                notEventFilter = city;
+                city = city.replace(" ","-");
                 searchable = city+"-"+state;
                 searchable = removeAccents(searchable);
             } catch (Exception e) {
