@@ -1,77 +1,68 @@
-//package com.example.whereapplication.Adapter;
 //
+//package com.example.whereapplication.Adapter;
 //import android.app.Activity;
+//import android.os.Bundle;
+//import android.os.PersistableBundle;
+//import com.example.whereapplication.R;
+//import android.provider.CalendarContract;
+//import android.support.v7.app.AppCompatActivity;
+//import android.view.View;
+//import android.view.ViewGroup;
 //import android.widget.BaseAdapter;
+//import android.widget.ImageView;
+//import android.widget.TextView;
 //
 //import com.example.whereapplication.Object.Event;
-//
 //import java.util.List;
 //
-//public class AdapterList extends BaseAdapter {
-//
-//
+//public  class AdapterList extends BaseAdapter {
 //    private final List<Event> events;
-//    private final Activity activity;
+//    private final Activity act;
 //
-//    public AdapterList(Activity activity, List<Event> events) {
+//    private TextView local;
+//    private TextView preco;
+//    private TextView titulo;
+//    private TextView data;
+//    private ImageView imagem;
+//    public AdapterList (List<Event> events, Activity act) {
 //        this.events = events;
-//        this.activity = activity;
+//        this.act = act;
+//
 //    }
 //
 //    @Override
 //    public int getCount() {
-//        return this.events.size();
+//        return events.size();
 //    }
 //
 //    @Override
 //    public Object getItem(int position) {
-//        return this.events.get(position);
+//        return events.get(position);
 //    }
 //
 //    @Override
-//    public int getItemId(int position) {
-//        return this.events.get(position).getId();
+//    public long getItemId(int position) {
+//        return 0;
 //    }
 //
 //    @Override
 //    public View getView(int position, View convertView, ViewGroup parent) {
+//        View view = act.getLayoutInflater().inflate(R.layout.list_adpter,parent,false);
+//        Event event = events.get(position);
+//        titulo = view.findViewById(R.id.list_adpter_title);
+//        data = view.findViewById(R.id.list_adpter_date);
+//        preco = view.findViewById(R.id.list_adpter_price);
+//        local = view.findViewById(R.id.list_adpter_localization);
+//        imagem = view.findViewById(R.id.list_adpter_image);
 //
-////        View linha = convertView;
-////        Contato contato = events.get(position);
-////        Bitmap bm;
-////
-////        if(linha == null){
-////            linha = this.activity.getLayoutInflater().inflate(R.layout.celula_layout, parent, false);
-////        }
 //
-//        TextView nome = (TextView) linha.findViewById(R.id.nomeCelula);
-//        TextView email = (TextView) linha.findViewById(R.id.emailCelula);
-//        TextView site = (TextView) linha.findViewById(R.id.siteCelula);
-//        TextView telefone = (TextView) linha.findViewById(R.id.telefoneCelula);
-//        TextView endereco = (TextView) linha.findViewById(R.id.enderecoCelula);
-//
-//        if(position%2 == 0){
-//            linha.setBackgroundColor(activity.getResources().getColor(R.color.corPar));
-//        }else {
-//            linha.setBackgroundColor(activity.getResources().getColor(R.color.corImpar));
-//        }
-//
-//        nome.setText(contato.getNome());
-//
-//        if(contato.getFoto() != null){
-//            bm = BitmapFactory.decodeFile(contato.getFoto());
-//        }else{
-//            bm = BitmapFactory.decodeResource(activity.getResources(), R.drawable.ic_no_image);
-//        }
-//        bm = Bitmap.createScaledBitmap(bm, 180, 120, true);
-//        ImageView foto = (ImageView) linha.findViewById(R.id.imagemCelula);
-//        foto.setImageBitmap(bm);
-//
-//        if(email != null){email.setText(contato.getEmail());}
-//        if(site != null){site.setText(contato.getSite());}
-//        if(telefone != null){telefone.setText(contato.getTelefone());}
-//        if(endereco != null){endereco.setText(contato.getEndereco());}
-//
-//        return linha;
+//        //populando as Views
+//        titulo.setText(event.getTitle());
+//        preco.setText(String.valueOf(event.getPrice()));
+//        data.setText(event.getDate());
+//        local.setText(event.getLocal());
+//        imagem.setImageBitmap(R.drawable.java);
+//        return view;
 //    }
 //}
+//
