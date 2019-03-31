@@ -1,77 +1,82 @@
-//package com.example.whereapplication.Adapter;
-//
-//import android.app.Activity;
-//import android.widget.BaseAdapter;
-//
-//import com.example.whereapplication.Object.Event;
-//
-//import java.util.List;
-//
-//public class AdapterList extends BaseAdapter {
-//
-//
-//    private final List<Event> events;
-//    private final Activity activity;
-//
-//    public AdapterList(Activity activity, List<Event> events) {
-//        this.events = events;
-//        this.activity = activity;
-//    }
-//
-//    @Override
-//    public int getCount() {
-//        return this.events.size();
-//    }
-//
-//    @Override
-//    public Object getItem(int position) {
-//        return this.events.get(position);
-//    }
-//
-//    @Override
-//    public int getItemId(int position) {
-//        return this.events.get(position).getId();
-//    }
-//
-//    @Override
-//    public View getView(int position, View convertView, ViewGroup parent) {
-//
-////        View linha = convertView;
-////        Contato contato = events.get(position);
-////        Bitmap bm;
-////
-////        if(linha == null){
-////            linha = this.activity.getLayoutInflater().inflate(R.layout.celula_layout, parent, false);
-////        }
-//
-//        TextView nome = (TextView) linha.findViewById(R.id.nomeCelula);
-//        TextView email = (TextView) linha.findViewById(R.id.emailCelula);
-//        TextView site = (TextView) linha.findViewById(R.id.siteCelula);
-//        TextView telefone = (TextView) linha.findViewById(R.id.telefoneCelula);
-//        TextView endereco = (TextView) linha.findViewById(R.id.enderecoCelula);
-//
-//        if(position%2 == 0){
-//            linha.setBackgroundColor(activity.getResources().getColor(R.color.corPar));
-//        }else {
-//            linha.setBackgroundColor(activity.getResources().getColor(R.color.corImpar));
-//        }
-//
-//        nome.setText(contato.getNome());
-//
-//        if(contato.getFoto() != null){
-//            bm = BitmapFactory.decodeFile(contato.getFoto());
-//        }else{
-//            bm = BitmapFactory.decodeResource(activity.getResources(), R.drawable.ic_no_image);
-//        }
-//        bm = Bitmap.createScaledBitmap(bm, 180, 120, true);
-//        ImageView foto = (ImageView) linha.findViewById(R.id.imagemCelula);
-//        foto.setImageBitmap(bm);
-//
-//        if(email != null){email.setText(contato.getEmail());}
-//        if(site != null){site.setText(contato.getSite());}
-//        if(telefone != null){telefone.setText(contato.getTelefone());}
-//        if(endereco != null){endereco.setText(contato.getEndereco());}
-//
-//        return linha;
-//    }
-//}
+
+package com.example.whereapplication.Adapter;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.os.PersistableBundle;
+import com.example.whereapplication.R;
+import android.provider.CalendarContract;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+
+import com.example.whereapplication.Object.Event;
+
+import java.util.List;
+public class AdpterList extends AppCompatActivity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.list_adpter);
+    }
+}
+public  class list_Adapter extends BaseAdapter {
+
+    private final List<Event> events;
+    private final Activity act;
+
+
+    public list_Adapter (List<CalendarContract.Events> eventos, Activity act) {
+        this.eventos = enventos;
+        this.act = act;
+
+    }
+
+    @Override
+    public int getCount() {
+        return eventos.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return eventos.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return 0;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View view = act.getLayoutInflater()
+                .inflate(R.layout.activity_list, parent, false);
+        Even eventos = eventos.get(position);
+        return null;
+
+        //pegando as referências das Views
+        TextView titulo = (TextView)
+                view.findViewById(R.id.list_adpter_title);
+        TextView local = (TextView)
+                view.findViewById(R.id.list_adpter_localization);
+        TextView data = (TextView)
+                view.findViewById(R.id.list_adpter_date);
+        TextView preco = (TextView)
+                view.findViewById(R.id.list_adpter_price);
+        ImageView imagem = (ImageView)
+                view.findViewById(R.id.list_adpter_image);
+
+
+        //populando as Views
+        titulo.setText(eventos.getTitulo());
+        preco.setText(eventos.getPreco());
+        data.setText(eventos.getData());
+        local.setText(eventos.getLocal());
+        imagem.setImageResource(R.drawable.java);
+
+        return view;
+    }
+}
+
+
