@@ -50,6 +50,7 @@ public class ListActivity extends AppCompatActivity {
     Bundle extras;
     String location;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,25 +68,26 @@ public class ListActivity extends AppCompatActivity {
         String eventPrice;
         Event event = new Event();
         String cellUrl;
+        Document doc;
+        int gridSize, j;
 
+        Elements eventGrid;
+        ArrayList<Event> eventList = new ArrayList<Event>();
         @Override
         protected Void doInBackground(Void... voids) {
             try {
-                for (int j = 0; j < 30; j++) {
+                for ( j = 0; j < 30; j++) {
+                    Log.i("teste","page"+j);
                     String url = "https://www.sympla.com.br/eventos/" + location + "?ordem=data&pagina=" + j;
-//              Log.i("teste","page"+j);
-                    final Document doc = Jsoup.connect(url).get();
-                    Elements ifExists = doc.normalise().select("h3[class=pull-left]");
-                    if (!ifExists.isEmpty()) {
-                        continue;
-                    }
-                    Elements eventGrid = doc.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
-                    final int gridSize = eventGrid.size();
-                    final int finalJ = j;
+                    doc = Jsoup.connect(url).get();
+                    eventGrid = doc.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
+                    gridSize = eventGrid.size();
+//                    Log.i("teste",String.valueOf(gridSize));
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
                             for (int i = 0; i < gridSize; i++) {
+                                Event event = new Event();
                                 Elements eventLocationDoc = doc.select("div[class=uppercase line]").select("p").eq(i);
                                 eventLocation = eventLocationDoc.text();
                                 Elements eventNameDoc = doc.select("div[class=event-name]").select("p").eq(i);
@@ -94,10 +96,10 @@ public class ListActivity extends AppCompatActivity {
                                 Elements eventDayDoc = doc.select("div[class=calendar-day]").eq(i);
                                 Elements eventTimeDoc = doc.normalise().select("div[class=line]").not("i").eq(i);
                                 eventDate = eventDayDoc.text() + "/" + eventMonthDoc.text() + " " + eventTimeDoc.text();
-                                event.setDate(eventDate);
-                                event.setLocal(eventLocation);
-                                event.setTitle(eventName);
-//                                Log.i("teste","event"+ finalJ);
+                                eventList.add(i,event);
+                                eventList.get(i).setDate(eventDate);
+                                eventList.get(i).setTitle(eventName);
+                                eventList.get(i).setLocal(eventLocation);
                             }
                         }
                     }).start();
@@ -108,16 +110,19 @@ public class ListActivity extends AppCompatActivity {
                                 for (int i = 0; i < gridSize; i++) {
                                     cellUrl = doc.select("a.event-box-link").eq(i).attr("href");
                                     Document eventCell = Jsoup.connect(cellUrl).get();
-                                    Elements eventPriceDoc = eventCell.select("tbody");
+                                    Log.i("teste_page"+j ,cellUrl);
+                                    Elements eventPriceDoc = eventCell.select("tdclass").eq(i).select("span");
                                     eventPrice = eventPriceDoc.text();
-                                    event.setPrice(eventPrice);
-                                    Log.i("teste","price"+ finalJ);
+                                    Log.i("teste_page"+j, eventPrice);
+                                    eventList.get(i).setPrice(eventPrice);
                                 }
                             } catch (Exception e) {
                                 e.getStackTrace();
                             }
+
                         }
-                    }).start();
+                    }).run();
+//                    Log.i("teste",eventList);
                 }
             } catch (Exception e) {
                 e.getStackTrace();
