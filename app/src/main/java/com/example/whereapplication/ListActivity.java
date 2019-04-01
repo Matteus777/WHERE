@@ -50,6 +50,7 @@ public class ListActivity extends AppCompatActivity {
     Bundle extras;
     String location;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +59,7 @@ public class ListActivity extends AppCompatActivity {
         extras = intent.getExtras();
         location = extras.getString("location");
         new Description().execute();
+
     }
 
     public class Description extends AsyncTask<Void, Void, Void> {
@@ -67,65 +69,91 @@ public class ListActivity extends AppCompatActivity {
         String eventPrice;
         Event event = new Event();
         String cellUrl;
-
+        String filter;
+        Document doc;
+        Elements eventGrid;
+        TextView tvFilter;
+        int i;
+        ArrayList<Event> eventList = new ArrayList<Event>();
         @Override
         protected Void doInBackground(Void... voids) {
-            try {
-                for (int j = 0; j < 30; j++) {
-                    String url = "https://www.sympla.com.br/eventos/" + location + "?ordem=data&pagina=" + j;
-//              Log.i("teste","page"+j);
-                    final Document doc = Jsoup.connect(url).get();
-                    Elements ifExists = doc.normalise().select("h3[class=pull-left]");
-                    if (!ifExists.isEmpty()) {
-                        continue;
-                    }
-                    Elements eventGrid = doc.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
-                    final int gridSize = eventGrid.size();
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                for (int i = 0; i < gridSize; i++) {
-                                    Log.i("testao",String.valueOf(i));
-                                    cellUrl = doc.select("a.event-box-link").attr("href");
-                                    Document eventCell = Jsoup.connect(cellUrl).get();
-                                    Elements eventPriceDoc = eventCell.select("tbody");
-                                    eventPrice = eventPriceDoc.text();
-                                    event.setPrice(eventPrice);
-                                    Log.i("teste","price"+i);
+            filter = "musica";
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        for (int j = 0; j < 30; j++) {
+                            Log.i("teste", "page" + j);
+                            String url = "https://www.sympla.com.br/eventos/"+location+"?s="+"musica"+"&pagina="+j;
+                            final Document doc = Jsoup.connect(url).get();
+                            Elements ifExists = doc.normalise().select("h3[class=pull-left]");
+                            if (!ifExists.isEmpty()) {
+                                continue;
+                            }
+                            Elements eventGrid = doc.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
+                            int gridSize = eventGrid.size();
+                            for ( i = 0; i < 21; i++) {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            cellUrl = doc.select("a.event-box-link").eq(i).attr("href");
+                                            Log.i("teste", cellUrl);
+                                            Document eventCell = Jsoup.connect(cellUrl).get();
+                                            Elements eventPriceDoc = eventCell.select("tbody");
+                                            eventPrice = eventPriceDoc.text();
+                                            event.setPrice(eventPrice);
+                                        }catch (Exception e ){
+                                            e.getStackTrace();
+                                        }
+                                        }
+                                    }).start();
                                 }
-                            } catch (Exception e) {
-                                e.getStackTrace();
-                            }
                         }
-                    }).start();
+                    } catch (Exception e) {
+                        e.getStackTrace();
+                    }
+                }
+                        }).start();
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            for (int i = 0; i < gridSize; i++) {
-                                Elements eventLocationDoc = doc.select("div[class=uppercase line]").select("p").eq(i);
-                                eventLocation = eventLocationDoc.text();
-                                Elements eventNameDoc = doc.select("div[class=event-name]").select("p").eq(i);
-                                eventName = eventNameDoc.text();
-                                Elements eventMonthDoc = doc.select("div[class=calendar-month]").eq(i);
-                                Elements eventDayDoc = doc.select("div[class=calendar-day]").eq(i);
-                                Elements eventTimeDoc = doc.normalise().select("div[class=line]").not("i").eq(i);
-                                eventDate = eventDayDoc.text() + "/" + eventMonthDoc.text() + " " + eventTimeDoc.text();
-                                event.setDate(eventDate);
-                                event.setLocal(eventLocation);
-                                event.setTitle(eventName);
-//                                Log.i("teste","event"+ finalJ);
-                            }
+                            try{
+                                for (int k = 0; k < 30; k++) {
+                                    Log.i("testin", "page" + k);
+                                    String url = "https://www.sympla.com.br/eventos/"+location+"?s="+"musica"+"&pagina="+k;
+                                    final Document doc = Jsoup.connect(url).get();
+                                    Elements ifExists = doc.normalise().select("h3[class=pull-left]");
+                                    if (!ifExists.isEmpty()) {
+                                        break;
+                                    }
+                                    Elements eventGrid = doc.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
+                                    int gridSize = eventGrid.size();
+                                    for (int i = 0; i < gridSize; i++) {
+                                        Event event = new Event();
+                                        Elements eventLocationDoc = doc.select("div[class=uppercase line]").select("p").eq(i);
+                                        eventLocation = eventLocationDoc.text();
+                                        Elements eventNameDoc = doc.select("div[class=event-name]").select("p").eq(i);
+                                        eventName = eventNameDoc.text();
+                                        Elements eventMonthDoc = doc.select("div[class=calendar-month]").eq(i);
+                                        Elements eventDayDoc = doc.select("div[class=calendar-day]").eq(i);
+                                        Elements eventTimeDoc = doc.normalise().select("div[class=line]").not("i").eq(i);
+                                        eventDate = eventDayDoc.text() + "/" + eventMonthDoc.text() + " " + eventTimeDoc.text();
+                                        Log.i("teste",eventName);
+                                    }
+                                }
+                        }catch(Exception e ){
+                            e.getStackTrace();
                         }
-                    }).start();
-                }
-            } catch (Exception e) {
-                e.getStackTrace();
+                    }
+                }).start();
+            return null;  }
             }
-            return null;
-        }
-    }
 }
+
+
+
+
 
 
 
