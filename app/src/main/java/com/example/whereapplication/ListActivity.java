@@ -81,7 +81,24 @@ public class ListActivity extends AppCompatActivity {
                     }
                     Elements eventGrid = doc.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
                     final int gridSize = eventGrid.size();
-                    final int finalJ = j;
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                for (int i = 0; i < gridSize; i++) {
+                                    Log.i("testao",String.valueOf(i));
+                                    cellUrl = doc.select("a.event-box-link").attr("href");
+                                    Document eventCell = Jsoup.connect(cellUrl).get();
+                                    Elements eventPriceDoc = eventCell.select("tbody");
+                                    eventPrice = eventPriceDoc.text();
+                                    event.setPrice(eventPrice);
+                                    Log.i("teste","price"+i);
+                                }
+                            } catch (Exception e) {
+                                e.getStackTrace();
+                            }
+                        }
+                    }).start();
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -98,23 +115,6 @@ public class ListActivity extends AppCompatActivity {
                                 event.setLocal(eventLocation);
                                 event.setTitle(eventName);
 //                                Log.i("teste","event"+ finalJ);
-                            }
-                        }
-                    }).start();
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                for (int i = 0; i < gridSize; i++) {
-                                    cellUrl = doc.select("a.event-box-link").eq(i).attr("href");
-                                    Document eventCell = Jsoup.connect(cellUrl).get();
-                                    Elements eventPriceDoc = eventCell.select("tbody");
-                                    eventPrice = eventPriceDoc.text();
-                                    event.setPrice(eventPrice);
-                                    Log.i("teste","price"+ finalJ);
-                                }
-                            } catch (Exception e) {
-                                e.getStackTrace();
                             }
                         }
                     }).start();
