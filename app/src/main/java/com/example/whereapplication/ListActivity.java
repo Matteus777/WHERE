@@ -78,51 +78,49 @@ public class ListActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             filter = "musica";
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
                     try {
                         for (int j = 0; j < 30; j++) {
                             Log.i("teste", "page" + j);
                             String url = "https://www.sympla.com.br/eventos/"+location+"?s="+"musica"+"&pagina="+j;
-                            final Document doc = Jsoup.connect(url).get();
+                            doc = Jsoup.connect(url).get();
                             Elements ifExists = doc.normalise().select("h3[class=pull-left]");
                             if (!ifExists.isEmpty()) {
                                 continue;
                             }
                             Elements eventGrid = doc.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
                             int gridSize = eventGrid.size();
-                            for ( i = 0; i < 21; i++) {
+                            for ( i = 0; i < gridSize; i++) {
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
+
+                                       cellUrl = doc.select("a.event-box-link").eq(i).attr("href");
                                         try {
-                                            cellUrl = doc.select("a.event-box-link").eq(i).attr("href");
-                                            Log.i("teste", cellUrl);
                                             Document eventCell = Jsoup.connect(cellUrl).get();
+                                            Log.i("teste",cellUrl);
                                             Elements eventPriceDoc = eventCell.select("tbody");
                                             eventPrice = eventPriceDoc.text();
                                             event.setPrice(eventPrice);
-                                        }catch (Exception e ){
+                                        } catch (Exception e) {
                                             e.getStackTrace();
                                         }
-                                        }
-                                    }).start();
-                                }
+                            }
+                        }).start();
+                            }
                         }
                     } catch (Exception e) {
                         e.getStackTrace();
                     }
-                }
-                        }).start();
+
+
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
                             try{
                                 for (int k = 0; k < 30; k++) {
-                                    Log.i("testin", "page" + k);
+//                                    Log.i("testin", "page" + k);
                                     String url = "https://www.sympla.com.br/eventos/"+location+"?s="+"musica"+"&pagina="+k;
-                                    final Document doc = Jsoup.connect(url).get();
+                                    doc = Jsoup.connect(url).get();
                                     Elements ifExists = doc.normalise().select("h3[class=pull-left]");
                                     if (!ifExists.isEmpty()) {
                                         break;
@@ -139,7 +137,7 @@ public class ListActivity extends AppCompatActivity {
                                         Elements eventDayDoc = doc.select("div[class=calendar-day]").eq(i);
                                         Elements eventTimeDoc = doc.normalise().select("div[class=line]").not("i").eq(i);
                                         eventDate = eventDayDoc.text() + "/" + eventMonthDoc.text() + " " + eventTimeDoc.text();
-                                        Log.i("teste",eventName);
+//                                        Log.i("teste",eventName);
                                     }
                                 }
                         }catch(Exception e ){
