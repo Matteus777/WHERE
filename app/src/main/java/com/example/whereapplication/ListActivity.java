@@ -68,22 +68,23 @@ public class ListActivity extends AppCompatActivity {
         String eventName;
         String eventDate;
         String eventPrice;
-        Event event = new Event();
         String[] cellUrl;
         String filter;
         Document doc;
+        int j;
         Elements eventGrid;
+        int w;
         public TextView tvFilter;
         String cellEvent;
-        int a = 0;
+        int eventCount;
         int i;
-        int f;
-        volatile Event[] eventList;
+        String eventPriceNum;
+        ArrayList<Event> eventList;
         @Override
         public Void doInBackground(Void... voids) {
             filter = "musica";
                     try {
-                        for (int j = 1; j < 30; j++) {
+                        for (j = 1; j < 30; j++) {
 //                            Log.i("teste", "page" + j);
                             String url = "https://www.sympla.com.br/eventos/"+location+"?s="+"musica"+"&pagina="+j;
                             doc = Jsoup.connect(url).get();
@@ -93,36 +94,35 @@ public class ListActivity extends AppCompatActivity {
                             }
                             Elements eventGrid = doc.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
                             int gridSize = eventGrid.size();
-                            eventList = new Event[gridSize];
                             cellUrl = new String[gridSize];
                             for ( i = 0; i < gridSize; i++) {
                                 cellUrl[i] = doc.select("a.event-box-link").eq(i).attr("href");
-
-
                             }
-                            for(final String cellEvent:cellUrl){
+                            for(w = 0;w<cellUrl.length;w++){
                             new Thread(new Runnable() {
                                 @Override
                                 public synchronized void run() {
                                     try {
-                                                  Document eventCell = Jsoup.connect(cellEvent).get();
+                                                  Event event = new Event();
+                                                  Document eventCell = Jsoup.connect(cellUrl[w]).get();
                                                   Elements eventPriceSizeElement = eventCell.select("tr");
                                                   int eventPriceSize = eventPriceSizeElement.size();
                                                   for(int p = 1;p<eventPriceSize;p++) {
-                                                      Elements eventPriceDoc = eventCell.select("tr").eq(p).select("td").eq(0);
+                                                      Elements eventPriceDoc = eventCell.normalise().select("tr").eq(p).select("td").eq(0).select("span").eq(1);
+                                                      eventPriceNum = eventPriceDoc.text();
+//                                                      eventPriceNum = eventPriceNum.replaceAll(" ","");
+                                                      Log.i("teste",eventPriceNum);
+                                                      Elements eventPriceDoc1 = eventCell.normalise().select("tr").eq(p).select("td").eq(0).select("br").select("span");
                                                       Elements eventPriceCheck = eventCell.select("tr").eq(p).select("td").eq(1);
                                                       if(eventPriceCheck.text().contains("Esgotado")||eventPriceCheck.text().contains("Encerrado")){
                                                       }else{
-                                                          Log.i("teste",eventPriceDoc.text());
-
+                                                          eventPrice = eventPriceDoc.text()+"  "+eventPriceDoc1.text();
                                                       }
                                                   }
-
                                               } catch (Exception e) {
                                                   e.getStackTrace();
                                               }
                                         }
-
                         }).start();
                             }
                         }
@@ -134,27 +134,27 @@ public class ListActivity extends AppCompatActivity {
                         @Override
                         public synchronized void run() {
                             try{
-                                for (int k = 0; k < 30; k++) {
-//                                    Log.i("testin", "page" + k);
+                                wait(1000);
+                                for (int k = 1; k < 30; k++) {
+//                                   Log.i("testin", "page" + k);
                                     String url = "https://www.sympla.com.br/eventos/"+location+"?s="+"musica"+"&pagina="+k;
-                                    doc = Jsoup.connect(url).get();
-                                    Elements ifExists = doc.normalise().select("h3[class=pull-left]");
+                                    Document docs = Jsoup.connect(url).get();
+                                    Elements ifExists = docs.normalise().select("h3[class=pull-left]");
                                     if (!ifExists.isEmpty()) {
                                         break;
                                     }
-                                    Elements eventGrid = doc.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
+                                    Elements eventGrid = docs.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
                                     int gridSize = eventGrid.size();
-                                    eventList = new Event[gridSize];
                                     for (int i = 0; i < gridSize; i++) {
-                                        Elements eventLocationDoc = doc.select("div[class=uppercase line]").select("p").eq(i);
+                                        Elements eventLocationDoc = docs.select("div[class=uppercase line]").select("p").eq(i);
                                         eventLocation = eventLocationDoc.text();
-                                        Elements eventNameDoc = doc.select("div[class=event-name]").select("p").eq(i);
+                                        Elements eventNameDoc = docs.select("div[class=event-name]").select("p").eq(i);
                                         eventName = eventNameDoc.text();
-                                        Elements eventMonthDoc = doc.select("div[class=calendar-month]").eq(i);
-                                        Elements eventDayDoc = doc.select("div[class=calendar-day]").eq(i);
-                                        Elements eventTimeDoc = doc.normalise().select("div[class=line]").not("i").eq(i);
+                                        Elements eventMonthDoc = docs.select("div[class=calendar-month]").eq(i);
+                                        Elements eventDayDoc = docs.select("div[class=calendar-day]").eq(i);
+                                        Elements eventTimeDoc = docs.normalise().select("div[class=line]").not("i").eq(i);
                                         eventDate = eventDayDoc.text() + "/" + eventMonthDoc.text() + " " + eventTimeDoc.text();
-                                        Log.i("teste",eventName);
+
                                     }
                                 }
                         }catch(Exception e ){
