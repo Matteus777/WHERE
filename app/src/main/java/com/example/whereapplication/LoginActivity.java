@@ -65,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
 
     List<AuthUI.IdpConfig> providers = Arrays.asList(
             new AuthUI.IdpConfig.PhoneBuilder().build(),
-            new AuthUI.IdpConfig.FacebookBuilder().setPermissions(permissions).build());
+            new AuthUI.IdpConfig.FacebookBuilder().build());
     public String city;
     public String notEventFilter;
 
