@@ -61,8 +61,6 @@ public class LoginActivity extends AppCompatActivity {
     final int RC_SIGN_IN = 123;
     final int USER_LOCATION = 1;
     public String searchable;
-    List<String> permissions = Arrays.asList("public_profile");
-
     List<AuthUI.IdpConfig> providers = Arrays.asList(
             new AuthUI.IdpConfig.PhoneBuilder().build(),
             new AuthUI.IdpConfig.FacebookBuilder().build());

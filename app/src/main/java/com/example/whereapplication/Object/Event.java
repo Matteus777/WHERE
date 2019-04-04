@@ -8,11 +8,19 @@ import java.util.UUID;
 public class Event {
     private String local;
     private String id;
-    private String price;
+    private Price[] price;
     private String title;
     private Image photo;
     private String date;
     private String desc;
+
+    public Price[] getPrice() {
+        return price;
+    }
+
+    public void setPrice(Price[] price) {
+        this.price = price;
+    }
 
     public String getDesc() {
         return desc;
@@ -44,13 +52,6 @@ public class Event {
         this.id = id;
     }
 
-    public String getPrice() {
-        return price;
-    }
-
-    public void setPrice(String price) {
-        this.price = price;
-    }
 
     public String getTitle() {
         return title;

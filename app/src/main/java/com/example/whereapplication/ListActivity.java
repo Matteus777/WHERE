@@ -18,6 +18,7 @@ import android.widget.ListView;
 import com.example.whereapplication.Object.Event;
 import com.example.whereapplication.DAO.DAO;
 import com.example.whereapplication.Object.Event;
+import com.example.whereapplication.Object.Price;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -77,6 +78,7 @@ public class ListActivity extends AppCompatActivity {
         String cellEvent;
         int eventCount;
         int i;
+        String url;
         double eventPriceNum;
         Event[][]eventList  = new Event[30][21];
         @Override
@@ -90,8 +92,8 @@ public class ListActivity extends AppCompatActivity {
             }
             try {
                 for (j = 1; j < 30; j++) {
-
-                    String url = "https://www.sympla.com.br/eventos/"+location+"?s="+"musica"+"&pagina="+j;
+                    Log.i("teste","page"+j);
+                    url = "https://www.sympla.com.br/eventos/"+location+"?s="+"musica"+"&pagina="+j;
                     doc = Jsoup.connect(url).get();
                     Elements ifExists = doc.normalise().select("h3[class=pull-left]");
                     if (!ifExists.isEmpty()) {
@@ -99,67 +101,69 @@ public class ListActivity extends AppCompatActivity {
                     }
                     Elements eventGrid = doc.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
                     int gridSize = eventGrid.size();
-
                     cellUrl = new String[gridSize];
                     for ( i = 0; i < gridSize; i++) {
                         cellUrl[i] = doc.select("a.event-box-link").eq(i).attr("href");
+
                     }
-                    for(w = 0;w<cellUrl.length;w++){
-
-
+                    for(final String cellEvent:cellUrl){
                         new Thread(new Runnable() {
                             @Override
                             public synchronized void run() {
                                 try {
-                                    Document eventCell = Jsoup.connect("https://www.sympla.com.br/boom---nossa-historia--12-anos-de-sandy-oficial-poa-0604__486861").get();
+                                    w++;
+                                    Document eventCell = Jsoup.connect(cellEvent).get();
                                     Elements eventPriceSizeElement = eventCell.select("form#ticket-form").select("tr");
                                     int eventPriceSize = eventPriceSizeElement.size();
+                                    Price[] priceObj = new Price[eventPriceSize];
                                     for(int p = 1;p<eventPriceSize;p++) {
                                         Elements eventPriceCheck = eventCell.select("tr").eq(p).select("td.opt-panel");
-
                                         if(eventPriceCheck.text().contains("Esgotado")||eventPriceCheck.text().contains("Encerrado")){
-                                        }else {
+                                        }
+                                            else {
+                                                //TESTAR PQ O EVENTPRICEDOCSIZE NAO ESTA RETORNANDO OS PRECOS CERTOS
+                                                Elements eventPriceDocSize = eventCell.normalise().select("tr").eq(p).select("td").eq(0).select("span").eq(1);
+//                                                if (eventPriceDocSize.text().contains("Grátis")) {
+                                                    Log.i("teste",eventPriceDocSize.text());
+//                                                    eventPriceNum = Double.valueOf("0");
+//                                            } else {
+//                                                   Elements eventPriceDoc = eventCell.normalise().select("tr").eq(p).select("td").eq(0).select("span").eq(1);
+                                                    eventPrice = eventPriceDocSize.text();
 
-//                                            eventPrice = eventPriceDoc.text()+"  "+eventPriceDoc1.text();
-
-                                                Elements eventPriceDocSize = eventCell.normalise().select("td.opt-panel").eq(p).select("td").eq(0).select("text");
-                                                if (eventPriceDocSize.text().contains("Grátis")) {
-                                                    eventPriceNum = Double.valueOf("0");
-                                            } else {
-                                                    Elements eventPriceDoc = eventCell.normalise().select("tr").eq(p).select("td").eq(0).select("span").eq(1);
-                                                    eventPrice = eventPriceDoc.text();
-
-
-                                                }
+//
                                                 Elements eventPriceDoc1 = eventCell.normalise().select("tr").eq(p).select("td").eq(0).select("span").eq(0);
                                                 String price = eventPrice.substring(3);
                                                 price = price.replaceAll(",",".");
                                                 eventPriceNum=Double.valueOf(price);
-                                                Log.i("teste",String.valueOf(eventPriceNum));
+//                                            Log.i("teste",eventPriceDoc1.text());
+//                                            Log.i("teste",String.valueOf(eventPriceNum));
+                                                priceObj[p].setLote(eventPriceDoc1.text());
+                                                priceObj[p].setValue(eventPriceNum);
+                                                eventList[j][w].setPrice(priceObj);
 
 
 
-                                        }
+//                                               }
 
+                                            }
                                 }
-                                } catch (Exception e) {
+                                }catch (Exception e) {
                                     e.getStackTrace();
-                                }
                             }
-                        }).start();
-                    }
+                        }
+                    }).start();
                 }
-            } catch (Exception e) {
+            }
+            }catch (Exception e) {
                 e.getStackTrace();
             }
-
             new Thread(new Runnable() {
                 @Override
-                public synchronized void run() {
+                public void run() {
                     try{
                         for (int k = 1; k < 30; k++) {
 //                                   Log.i("testin", "page" + k);
-                            String url = "https://www.sympla.com.br/eventos/"+location+"?s="+"musica"+"&pagina="+k;
+                            String url = "https://www.sympla.com.br/eventos/"+location+"?s="+filter+"&pagina="+k;
                             Document docs = Jsoup.connect(url).get();
                             Elements ifExists = docs.normalise().select("h3[class=pull-left]");
                             if (!ifExists.isEmpty()) {
@@ -184,9 +188,10 @@ public class ListActivity extends AppCompatActivity {
                     }
                 }
             }).start();
-            return null;  }
-    }
+            return null; }
+        }
 }
+
 
 
 
