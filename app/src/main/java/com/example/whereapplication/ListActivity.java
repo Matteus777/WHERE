@@ -73,14 +73,16 @@ public class ListActivity extends AppCompatActivity {
         Document doc;
         int j;
         Elements eventGrid;
+        int p;
         int w;
         public TextView tvFilter;
-        String cellEvent;
+//        public String cellEvent;
         int eventCount;
         int i;
         String url;
-        double eventPriceNum;
         Event[][]eventList  = new Event[30][21];
+
+
         @Override
         public Void doInBackground(Void... voids) {
             filter = "musica";
@@ -92,7 +94,7 @@ public class ListActivity extends AppCompatActivity {
             }
             try {
                 for (j = 1; j < 30; j++) {
-                    Log.i("teste","page"+j);
+//                    Log.i("teste","page"+j);
                     url = "https://www.sympla.com.br/eventos/"+location+"?s="+"musica"+"&pagina="+j;
                     doc = Jsoup.connect(url).get();
                     Elements ifExists = doc.normalise().select("h3[class=pull-left]");
@@ -106,47 +108,44 @@ public class ListActivity extends AppCompatActivity {
                         cellUrl[i] = doc.select("a.event-box-link").eq(i).attr("href");
 
                     }
-                    for(final String cellEvent:cellUrl){
+                    for( final String cellEvent: cellUrl ){
                         new Thread(new Runnable() {
                             @Override
                             public synchronized void run() {
                                 try {
                                     w++;
-                                    Document eventCell = Jsoup.connect(cellEvent).get();
+//                                    Log.i("teste",cellEvent);
+//                                    Log.i("teste",String.valueOf(w));
+                                    Document eventCell = Jsoup.connect("https://www.sympla.com.br/virada-criativa-no-atelier-ieda-galvao__486326").get();
                                     Elements eventPriceSizeElement = eventCell.select("form#ticket-form").select("tr");
                                     int eventPriceSize = eventPriceSizeElement.size();
                                     Price[] priceObj = new Price[eventPriceSize];
-                                    for(int p = 1;p<eventPriceSize;p++) {
-                                        Elements eventPriceCheck = eventCell.select("tr").eq(p).select("td.opt-panel");
-                                        if(eventPriceCheck.text().contains("Esgotado")||eventPriceCheck.text().contains("Encerrado")){
-                                        }
-                                            else {
-                                                //TESTAR PQ O EVENTPRICEDOCSIZE NAO ESTA RETORNANDO OS PRECOS CERTOS
-                                                Elements eventPriceDocSize = eventCell.normalise().select("tr").eq(p).select("td").eq(0).select("span").eq(1);
-//                                                if (eventPriceDocSize.text().contains("Grátis")) {
-                                                    Log.i("teste",eventPriceDocSize.text());
-//                                                    eventPriceNum = Double.valueOf("0");
-//                                            } else {
-//                                                   Elements eventPriceDoc = eventCell.normalise().select("tr").eq(p).select("td").eq(0).select("span").eq(1);
-                                                    eventPrice = eventPriceDocSize.text();
-
+                                    for( p = 1; p<=eventPriceSize;p++) {
+                                        Log.i("teste for",String.valueOf(p));
+//                                        double eventPriceNum;
+//                                        Elements eventPriceCheck = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td.opt-panel");
+//                                        if(eventPriceCheck.text().contains("Esgotado")||eventPriceCheck.text().contains("Encerrado")||eventPriceCheck.text().contains("Não iniciado")){
 //
-                                                Elements eventPriceDoc1 = eventCell.normalise().select("tr").eq(p).select("td").eq(0).select("span").eq(0);
-                                                String price = eventPrice.substring(3);
-                                                price = price.replaceAll(",",".");
-                                                eventPriceNum=Double.valueOf(price);
-//                                            Log.i("teste",eventPriceDoc1.text());
-//                                            Log.i("teste",String.valueOf(eventPriceNum));
-                                                priceObj[p].setLote(eventPriceDoc1.text());
-                                                priceObj[p].setValue(eventPriceNum);
-                                                eventList[j][w].setPrice(priceObj);
-
-
-
-//                                               }
-
-                                            }
-                                }
+//                                        } else {
+//                                            Elements eventPriceDocSize = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0);
+////
+//                                            if (eventPriceDocSize.text().contains("Grátis")) {
+//
+//                                                eventPriceNum = 0;
+//                                            }
+//                                            else {
+////                                                   Elements eventPriceDoc = eventCell.normalise().select("tr").eq(p).select("td").eq(0).select("span").eq(1);
+//                                                String price = eventPriceDocSize.text().substring(3);
+//                                                price = price.replaceAll(",", ".");
+//                                                eventPriceNum = Double.valueOf(price);
+//
+//                                                }
+//                                            Elements eventPriceDoc1 = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0).select("span").eq(0);
+////                                          priceObj[p].setLote(eventPriceDoc1.text());
+////                                          priceObj[p].setValue(eventPriceNum);
+////                                          eventList[j][w].setPrice(priceObj);
+//                                        }
+                                    }
                                 }catch (Exception e) {
                                     e.getStackTrace();
                             }
@@ -254,3 +253,41 @@ public class ListActivity extends AppCompatActivity {
 //        };
 //        dbReference.addValueEventListener(eventListener);
 //    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
