@@ -106,12 +106,13 @@ public class ListActivity extends AppCompatActivity {
                         cellUrl[i] = doc.select("a.event-box-link").eq(i).attr("href");
 
                     }
+                    w=0;
                     for(final String cellEvent:cellUrl){
+                        w++;
                         new Thread(new Runnable() {
                             @Override
                             public synchronized void run() {
                                 try {
-                                    w++;
                                     Document eventCell = Jsoup.connect(cellEvent).get();
                                     Elements eventPriceSizeElement = eventCell.select("form#ticket-form").select("tr");
                                     int eventPriceSize = eventPriceSizeElement.size();
@@ -124,7 +125,7 @@ public class ListActivity extends AppCompatActivity {
                                                 //TESTAR PQ O EVENTPRICEDOCSIZE NAO ESTA RETORNANDO OS PRECOS CERTOS
                                                 Elements eventPriceDocSize = eventCell.normalise().select("tr").eq(p).select("td").eq(0).select("span").eq(1);
 //                                                if (eventPriceDocSize.text().contains("Grátis")) {
-                                                    Log.i("teste",eventPriceDocSize.text());
+                                                    Log.i("teste",String.valueOf(w));
 //                                                    eventPriceNum = Double.valueOf("0");
 //                                            } else {
 //                                                   Elements eventPriceDoc = eventCell.normalise().select("tr").eq(p).select("td").eq(0).select("span").eq(1);
@@ -137,9 +138,9 @@ public class ListActivity extends AppCompatActivity {
                                                 eventPriceNum=Double.valueOf(price);
 //                                            Log.i("teste",eventPriceDoc1.text());
 //                                            Log.i("teste",String.valueOf(eventPriceNum));
-                                                priceObj[p].setLote(eventPriceDoc1.text());
-                                                priceObj[p].setValue(eventPriceNum);
-                                                eventList[j][w].setPrice(priceObj);
+//                                                priceObj[p].setLote(eventPriceDoc1.text());
+//                                                priceObj[p].setValue(eventPriceNum);
+//                                                eventList[j][w].setPrice(priceObj);
 
 
 
