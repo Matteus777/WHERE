@@ -59,11 +59,11 @@ public class ListActivity extends AppCompatActivity {
         Intent intent = getIntent();
         extras = intent.getExtras();
         location = extras.getString("location");
-        new Description().execute();
+        new Search().execute();
 
     }
 
-    public class Description extends AsyncTask<Void, Void, Void> {
+    public class Search extends AsyncTask<Void, Void, Void> {
         String eventLocation;
         String eventName;
         String eventDate;
@@ -78,7 +78,7 @@ public class ListActivity extends AppCompatActivity {
         Document eventCell;
         int w;
         public TextView tvFilter;
-//        public String cellEvent;
+//      public String cellEvent;
         int eventCount;
         int i;
         String url;
@@ -98,7 +98,7 @@ public class ListActivity extends AppCompatActivity {
                 for (j = 1; j < 30; j++) {
 //                    Log.i("teste","page"+j);
                     url = "https://www.sympla.com.br/eventos/"+location+"?s="+"musica"+"&pagina="+j;
-                    doc = Jsoup.connect(url).get();
+                    doc = Jsoup. connect(url).get();
                     Elements ifExists = doc.normalise().select("h3[class=pull-left]");
                     if (!ifExists.isEmpty()) {
                         break;
@@ -110,14 +110,7 @@ public class ListActivity extends AppCompatActivity {
                         cellUrl[i] = doc.select("a.event-box-link").eq(i).attr("href");
                     }
                     for(final String cellEvent:cellUrl){
-
-
-//                                    Log.i("teste",String.valueOf(w));
-                                    new Thread(new Runnable() {
-                                        @Override
-                                        public synchronized void run() {
                                             try {
-                                            Log.i("teste",cellEvent);
                                            eventCell  = Jsoup.connect(cellEvent).get();
                                                 Elements eventPriceSizeElement = eventCell.select("form#ticket-form").select("tr");
                                                 eventPriceSize = eventPriceSizeElement.size();
@@ -132,17 +125,22 @@ public class ListActivity extends AppCompatActivity {
 
                                         }
                                         else {
-                                            Elements eventPriceDocSize = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0);
-                                            if (eventPriceDocSize.text().contains("Grátis")) {
+                                            Elements eventPrice = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0);
 
+                                            if (eventPrice.text().contains("Grátis")) {
+                                                Log.i("teste",eventPrice.text());
                                                 eventPriceNum = 0;
+
                                             }
                                             else {
-//
-//                                                String price = eventPriceDocSize.text().substring(3);
+                                                Elements eventPriceExists = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0).select("span").eq(1);
+                                                Log.i("teste",eventPriceExists.text());
+//                                                String price = eventPriceExists.text().substring(3);
 //                                                price = price.replaceAll(",", ".");
 //                                                eventPriceNum = Double.valueOf(price);
-//                                                Log.i("teste",String.valueOf(eventPriceNum));
+
+
+
 
                                                 }
 //                                            Elements eventPriceDoc1 = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0).select("span").eq(0);
@@ -151,8 +149,6 @@ public class ListActivity extends AppCompatActivity {
 ////                                          eventList[j][w].setPrice(priceObj);
                                         }
                                     }
-                                        }
-                                    }).start();
 
                 }
             }
