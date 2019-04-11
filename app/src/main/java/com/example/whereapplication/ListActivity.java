@@ -97,7 +97,7 @@ public class ListActivity extends AppCompatActivity {
             try {
                 for (j = 1; j < 30; j++) {
 //                    Log.i("teste","page"+j);
-                    url = "https://www.sympla.com.br/eventos/"+location+"?s="+"musica"+"&pagina="+j;
+                    url = "https://www.sympla.com.br/eventos/"+location+"?s="+"filter"+"&pagina="+j;
                     doc = Jsoup.connect(url).get();
                     Elements ifExists = doc.normalise().select("h3[class=pull-left]");
                     if (!ifExists.isEmpty()) {
@@ -110,8 +110,6 @@ public class ListActivity extends AppCompatActivity {
                         cellUrl[i] = doc.select("a.event-box-link").eq(i).attr("href");
                     }
                     for(final String cellEvent:cellUrl){
-
-
 //                                    Log.i("teste",String.valueOf(w));
                                     new Thread(new Runnable() {
                                         @Override
@@ -132,14 +130,16 @@ public class ListActivity extends AppCompatActivity {
 
                                         }
                                         else {
-                                            Elements eventPriceDocSize = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0);
+                                            Elements eventPriceDocSize = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0).select("span").eq(1);
                                             if (eventPriceDocSize.text().contains("Grátis")) {
 
                                                 eventPriceNum = 0;
                                             }
                                             else {
-//
-//                                                String price = eventPriceDocSize.text().substring(3);
+                                                 String price =
+                                                eventPriceNum = eventPriceDocSize.text().
+
+
 //                                                price = price.replaceAll(",", ".");
 //                                                eventPriceNum = Double.valueOf(price);
 //                                                Log.i("teste",String.valueOf(eventPriceNum));
@@ -159,9 +159,8 @@ public class ListActivity extends AppCompatActivity {
             }catch (Exception e) {
                 e.getStackTrace();
             }
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
+
+
                     try{
                         for (int k = 1; k < 30; k++) {
 //                                   Log.i("testin", "page" + k);
@@ -188,8 +187,6 @@ public class ListActivity extends AppCompatActivity {
                     }catch(Exception e ){
                         e.getStackTrace();
                     }
-                }
-            }).start();
             return null; }
         }
 }
