@@ -85,7 +85,6 @@ public class ListActivity extends AppCompatActivity {
         int i;
         String url;
         private DatabaseReference firebaseDatabase;
-
         int currentEvent;
         Event[]eventList  = new Event[630];
 
@@ -95,7 +94,7 @@ public class ListActivity extends AppCompatActivity {
             firebaseDatabase = FirebaseDatabase.getInstance().getReference();
             filter = "musica";
             for(int p = 0;p<eventList.length;p++){
-                Event e = new Event();
+               Event e = new Event();
                 eventList[p]=e;
             }
             try {
@@ -161,8 +160,6 @@ public class ListActivity extends AppCompatActivity {
                                         Elements eventPriceDoc1 = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0).select("span").eq(0);
                                         priceObj[p].setLote(eventPriceDoc1.text());
                                         eventList[currentEvent].setPrice(priceObj);
-
-
                                     }
                                 }
                             }
