@@ -34,8 +34,10 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Timestamp;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -78,27 +80,30 @@ public class ListActivity extends AppCompatActivity {
         Document eventCell;
         int w;
         public TextView tvFilter;
-//      public String cellEvent;
+        //      public String cellEvent;
         int eventCount;
         int i;
         String url;
-        Event[][]eventList  = new Event[30][21];
+        private DatabaseReference firebaseDatabase;
+
+        int currentEvent;
+        Event[]eventList  = new Event[630];
 
 
         @Override
         public Void doInBackground(Void... voids) {
+            firebaseDatabase = FirebaseDatabase.getInstance().getReference();
             filter = "musica";
-            for(int m=0;m<30;m++){
-                for(int n = 0;n<21;n++){
-                    Event event = new Event();
-                    eventList[m][n]=event;
-                }
+            for(int p = 0;p<eventList.length;p++){
+                Event e = new Event();
+                eventList[p]=e;
             }
             try {
+                currentEvent=0;
                 for (j = 1; j < 30; j++) {
-//                    Log.i("teste","page"+j);
-                    url = "https://www.sympla.com.br/eventos/"+location+"?s="+"musica"+"&pagina="+j;
-                    doc = Jsoup. connect(url).get();
+                    Log.i("teste","page"+j);
+                    url = "https://www.sympla.com.br/eventos/"+location+"?s="+filter+"&pagina="+j;
+                    doc = Jsoup.connect(url).get();
                     Elements ifExists = doc.normalise().select("h3[class=pull-left]");
                     if (!ifExists.isEmpty()) {
                         break;
@@ -110,84 +115,117 @@ public class ListActivity extends AppCompatActivity {
                         cellUrl[i] = doc.select("a.event-box-link").eq(i).attr("href");
                     }
                     for(final String cellEvent:cellUrl){
-                                            try {
-                                           eventCell  = Jsoup.connect(cellEvent).get();
-                                                Elements eventPriceSizeElement = eventCell.select("form#ticket-form").select("tr");
-                                                eventPriceSize = eventPriceSizeElement.size();
-                                                Price[] priceObj = new Price[eventPriceSize];
-                                            }catch (Exception e) {
-                                                e.getStackTrace();
-                                            }
-                                    for( p = 1; p<=eventPriceSize;p++) {
-                                        double eventPriceNum;
-                                        Elements eventPriceCheck = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td.opt-panel");
-                                        if(eventPriceCheck.text().contains("Esgotado")||eventPriceCheck.text().contains("Encerrado")||eventPriceCheck.text().contains("Não iniciado")){
+                        Log.i("teste_url",cellEvent);
+                        try {
+                            eventCell  = Jsoup.connect(cellEvent).get();
+                            Elements eventPriceSizeElement = eventCell.select("form#ticket-form").select("tr");
+                            eventPriceSize = eventPriceSizeElement.size();
 
-                                        }
-                                        else {
-                                            Elements eventPrice = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0);
+                        }catch (Exception e) {
+                            e.getStackTrace();
+                        }
+                        Price[] priceObj = new Price[eventPriceSize];
+                        for(int p = 0;p<priceObj.length;p++){
+                            Price price = new Price();
+                            priceObj[p]=price;
 
-                                            if (eventPrice.text().contains("Grátis")) {
-                                                Log.i("teste",eventPrice.text());
-                                                eventPriceNum = 0;
+                        }
+                        for( p = 1; p<eventPriceSize;p++) {
+                            double eventPriceNum;
+                            Elements eventPriceCheck = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td.opt-panel");
+                            if(eventPriceCheck.text().contains("Esgotado")||eventPriceCheck.text().contains("Encerrado")||eventPriceCheck.text().contains("Não iniciado")){
 
-                                            }
-                                            else {
-                                                Elements eventPriceExists = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0).select("span").eq(1);
-                                                Log.i("teste",eventPriceExists.text());
-//                                                String price = eventPriceExists.text().substring(3);
-//                                                price = price.replaceAll(",", ".");
-//                                                eventPriceNum = Double.valueOf(price);
+                            }
+                            else {
+                                Elements eventPrice = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0);
+                                String free = eventPrice.text().toLowerCase();
+                                free =  LoginActivity.removeAccents(free);
+//                                        Log.i("teste",free);
+                                if (free.contains("gratis")) {
+                                    eventPriceNum = 0;
+                                    priceObj[p-1].setValue(eventPriceNum);
+                                    Elements eventPriceDoc1 = eventPrice.select("span").eq(0);
+                                    priceObj[p].setLote(eventPriceDoc1.text());
+                                    Log.i("teste",String.valueOf(eventPriceDoc1.text()));
+                                    eventList[currentEvent].setPrice(priceObj);
+                                }
+                                else {
+                                    Elements checkID = eventCell.normalise().select("form#ticket-form").select("tr").eq(p);
+                                    if(checkID.attr("id").equals("show-discount")||checkID.attr("id").equals("discount-form")){
+                                    }else{
+                                        Elements eventPriceExists = checkID.select("td").eq(0).select("span").eq(1);
+                                        String price = eventPriceExists.text().substring(3);
+                                        price = price.replaceAll(",", ".");
+                                        eventPriceNum = Double.valueOf(price);
+                                        priceObj[p].setValue(eventPriceNum);
+                                        Elements eventPriceDoc1 = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0).select("span").eq(0);
+                                        priceObj[p].setLote(eventPriceDoc1.text());
+                                        eventList[currentEvent].setPrice(priceObj);
 
 
-
-
-                                                }
-//                                            Elements eventPriceDoc1 = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0).select("span").eq(0);
-////                                          priceObj[p].setLote(eventPriceDoc1.text());
-////                                          priceObj[p].setValue(eventPriceNum);
-////                                          eventList[j][w].setPrice(priceObj);
-                                        }
                                     }
+                                }
+                            }
+                        }
 
+                        currentEvent++;
+                    }
                 }
-            }
             }catch (Exception e) {
                 e.getStackTrace();
             }
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try{
-                        for (int k = 1; k < 30; k++) {
+            try{
+                for (int k = 1; k < 30; k++) {
 //                                   Log.i("testin", "page" + k);
-                            String url = "https://www.sympla.com.br/eventos/"+location+"?s="+filter+"&pagina="+k;
-                            Document docs = Jsoup.connect(url).get();
-                            Elements ifExists = docs.normalise().select("h3[class=pull-left]");
-                            if (!ifExists.isEmpty()) {
-                                break;
-                            }
-                            Elements eventGrid = docs.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
-                            int gridSize = eventGrid.size();
-                            for (int i = 0; i < gridSize; i++) {
-                                Elements eventLocationDoc = docs.select("div[class=uppercase line]").select("p").eq(i);
-                                eventLocation = eventLocationDoc.text();
-                                Elements eventNameDoc = docs.select("div[class=event-name]").select("p").eq(i);
-                                eventName = eventNameDoc.text();
-                                Elements eventMonthDoc = docs.select("div[class=calendar-month]").eq(i);
-                                Elements eventDayDoc = docs.select("div[class=calendar-day]").eq(i);
-                                Elements eventTimeDoc = docs.normalise().select("div[class=line]").not("i").eq(i);
-                                eventDate = eventDayDoc.text() + "/" + eventMonthDoc.text() + " " + eventTimeDoc.text();
-
-                            }
-                        }
-                    }catch(Exception e ){
-                        e.getStackTrace();
+                    String url = "https://www.sympla.com.br/eventos/"+location+"?s="+filter+"&pagina="+k;
+                    Document docs = Jsoup.connect(url).get();
+                    Elements ifExists = docs.normalise().select("h3[class=pull-left]");
+                    if (!ifExists.isEmpty()) {
+                        break;
+                    }
+                    Elements eventGrid = docs.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
+                    int gridSize = eventGrid.size();
+                    for (int i = 0; i < gridSize; i++) {
+                        Elements eventLocationDoc = docs.select("div[class=uppercase line]").select("p").eq(i);
+                        eventLocation = eventLocationDoc.text();
+                        Elements eventNameDoc = docs.select("div[class=event-name]").select("p").eq(i);
+                        eventName = eventNameDoc.text();
+                        Elements eventMonthDoc = docs.select("div[class=calendar-month]").eq(i);
+                        int month = Integer.parseInt(getMonth(eventMonthDoc.text()));
+                        Elements eventDayDoc = docs.select("div[class=calendar-day]").eq(i);
+                        int day = Integer.parseInt(eventDayDoc.text());
+                        Elements eventTimeDoc = docs.normalise().select("div[class=line]").not("i").eq(i);
+                        int hour = Integer.parseInt(eventTimeDoc.text().substring(0,1));
+                        eventDate = day + "/" + month + " " + hour;
+                        Timestamp date = new Timestamp(2019-month-day-hour);
                     }
                 }
-            }).start();
+            }catch(Exception e ){
+                e.getStackTrace();
+            }
             return null; }
+
+        private String getMonth(String month){
+            switch(month){
+                case "Jan":month = "1";
+                case "Fev":month = "2";
+                case "Mar":month ="3";
+                case "Abr":month = "4";
+                case "Mai":month = "5";
+                case "Jun":month = "6";
+                case "Jul":month = "7";
+                case "Ago":month = "8";
+                case "Set":month = "9";
+                case "Out":month = "10";
+                case "Nov":month = "11";
+                case "Dez":month = "12";
+
+            }
+            return month;
         }
+
+    }
+
 }
 
 

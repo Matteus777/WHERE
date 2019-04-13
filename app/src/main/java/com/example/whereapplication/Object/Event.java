@@ -1,7 +1,10 @@
 package com.example.whereapplication.Object;
 
 import android.media.Image;
+import android.os.health.TimerStat;
 
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.UUID;
 
@@ -11,7 +14,7 @@ public class Event {
     private Price[] price;
     private String title;
     private Image photo;
-    private String date;
+    private Timestamp date;
     private String desc;
 
     public Price[] getPrice() {
@@ -69,11 +72,11 @@ public class Event {
         this.photo = photo;
     }
 
-    public String getDate() {
+    public Timestamp getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Timestamp date) {
         this.date = date;
     }
 
