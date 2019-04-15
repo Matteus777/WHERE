@@ -34,10 +34,11 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Timestamp;
+import java.security.Timestamp;
+import java.sql.Date;
 import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 
 
@@ -69,7 +70,6 @@ public class ListActivity extends AppCompatActivity {
         String eventLocation;
         String eventName;
         String eventDate;
-        String eventPrice;
         String[] cellUrl;
         String filter;
         int eventPriceSize;
@@ -99,6 +99,8 @@ public class ListActivity extends AppCompatActivity {
             }
             try {
                 currentEvent=0;
+                Log.i("teste", "tempo: " + Calendar.getInstance().getTime().getTime() );
+            //    Log.i("teste","time: "+Timestamp.parse("2019-04-15 14:00:00"));
                 for (j = 1; j < 30; j++) {
                     Log.i("teste","page"+j);
                     url = "https://www.sympla.com.br/eventos/"+location+"?s="+filter+"&pagina="+j;
@@ -117,6 +119,30 @@ public class ListActivity extends AppCompatActivity {
                         Log.i("teste_url",cellEvent);
                         try {
                             eventCell  = Jsoup.connect(cellEvent).get();
+                            Elements eventNameElement = eventCell.select("h1.event-name");
+                            Elements eventLocationElement = eventCell.normalise().select("div.event-info-city");
+                            Elements eventDateElement = eventCell.normalise().select("div.event-info-calendar");
+
+                            eventName = eventNameElement.text();
+                            eventLocation = eventLocationElement.text();
+                            eventDate = eventDateElement.text();
+                            if(eventName.isEmpty()){
+                                eventName = eventCell.select("h1.uppercase").text();
+                            }
+                            Log.i("teste",eventName);
+
+
+
+
+
+
+
+
+
+
+
+
+
                             Elements eventPriceSizeElement = eventCell.select("form#ticket-form").select("tr");
                             eventPriceSize = eventPriceSizeElement.size();
 
@@ -171,51 +197,33 @@ public class ListActivity extends AppCompatActivity {
             }catch (Exception e) {
                 e.getStackTrace();
             }
-            try{
-                for (int k = 1; k < 30; k++) {
-//                                   Log.i("testin", "page" + k);
-                    String url = "https://www.sympla.com.br/eventos/"+location+"?s="+filter+"&pagina="+k;
-                    Document docs = Jsoup.connect(url).get();
-                    Elements ifExists = docs.normalise().select("h3[class=pull-left]");
-                    if (!ifExists.isEmpty()) {
-                        break;
-                    }
-                    Elements eventGrid = docs.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
-                    int gridSize = eventGrid.size();
-                    for (int i = 0; i < gridSize; i++) {
-                        Elements eventLocationDoc = docs.select("div[class=uppercase line]").select("p").eq(i);
-                        eventLocation = eventLocationDoc.text();
-                        Elements eventNameDoc = docs.select("div[class=event-name]").select("p").eq(i);
-                        eventName = eventNameDoc.text();
-                        Elements eventMonthDoc = docs.select("div[class=calendar-month]").eq(i);
-                        int month = Integer.parseInt(getMonth(eventMonthDoc.text()));
-                        Elements eventDayDoc = docs.select("div[class=calendar-day]").eq(i);
-                        int day = Integer.parseInt(eventDayDoc.text());
-                        Elements eventTimeDoc = docs.normalise().select("div[class=line]").not("i").eq(i);
-                        int hour = Integer.parseInt(eventTimeDoc.text().substring(0,1));
-                        eventDate = day + "/" + month + " " + hour;
-                        Timestamp date = new Timestamp(2019-month-day-hour);
-                    }
-                }
-            }catch(Exception e ){
-                e.getStackTrace();
-            }
             return null; }
 
         private String getMonth(String month){
             switch(month){
-                case "Jan":month = "1";
-                case "Fev":month = "2";
-                case "Mar":month ="3";
-                case "Abr":month = "4";
-                case "Mai":month = "5";
-                case "Jun":month = "6";
-                case "Jul":month = "7";
-                case "Ago":month = "8";
-                case "Set":month = "9";
-                case "Out":month = "10";
-                case "Nov":month = "11";
-                case "Dez":month = "12";
+                case "janeiro":month = "1";
+                    break;
+                case "fevereiro":month = "2";
+                    break;
+                case "março":month ="3";
+                    break;
+                case "abril":month = "4";
+                    break;
+                case "maio":month = "5";
+                    break;
+                case "junho":month = "6";
+                    break;
+                case "julho":month = "7";
+                    break;
+                case "agosto":month = "8";
+                    break;
+                case "setembro":month = "9";
+                    break;
+                case "outubro":month = "10";
+                    break;
+                case "novembro":month = "11";
+                    break;
+                case "dezembro":month = "12";
 
             }
             return month;
