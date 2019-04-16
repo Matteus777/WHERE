@@ -34,12 +34,15 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.security.Timestamp;
-import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 
 public class ListActivity extends AppCompatActivity {
@@ -59,6 +62,8 @@ public class ListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+        database = FirebaseDatabase.getInstance();
+        dbReference = database.getReference();
         Intent intent = getIntent();
         extras = intent.getExtras();
         location = extras.getString("location");
@@ -84,6 +89,7 @@ public class ListActivity extends AppCompatActivity {
         int eventCount;
         int i;
         int min;
+        Timestamp dateStamp;
         String url;
         private DatabaseReference firebaseDatabase;
         int currentEvent;
@@ -127,8 +133,11 @@ public class ListActivity extends AppCompatActivity {
                         }else{
                             min = 00;
                         }
+                        Calendar date = Calendar.getInstance();
+                        date.set(2019, eventMonth-1,eventDay,hour,min);
+                        dateStamp = new Timestamp(date.getTime().getTime());
+                        Log.i("teste",""+dateStamp.getTime());
 
-                        Log.i("teste",""+hour+" "+min+" "+sec);
                     }
                     for(final String cellEvent:cellUrl){
                         Log.i("teste_url",cellEvent);
@@ -148,28 +157,6 @@ public class ListActivity extends AppCompatActivity {
 
 
                             }
-
-                            int year = Calendar.getInstance().get(Calendar.YEAR);
-                            String hour = eventDate.substring(eventDate.indexOf(",")+1,24);
-                            if(hour.contains("h")|| hour.contains(" ")){
-                                hour = hour.replace("h","");
-                                hour = hour.replace(" ","");
-                            }
-
-                            String min = eventDate.substring(eventDate.indexOf(","),26);
-                            Log.i("teste",eventDateElement.text());
-
-
-
-
-
-
-
-
-
-
-
-
                             Elements eventPriceSizeElement = eventCell.select("form#ticket-form").select("tr");
                             eventPriceSize = eventPriceSizeElement.size();
 
@@ -218,9 +205,24 @@ public class ListActivity extends AppCompatActivity {
                             }
                         }
 
+
                         currentEvent++;
+
+                    }
+                    for(int l = 0;l<eventList.length;l++) {
+                        Log.i("teste","teste insert");
+                        eventList[i].setDate(dateStamp);
+                        Log.i("teste","teste insert1");
+                        eventList[i].setTitle(eventName);
+                        Log.i("teste","teste insert3");
+                        eventList[i].setLocal(eventLocation);
+                        Log.i("teste","teste insert9");
+                        eventList[i].setId(UUID.randomUUID().toString());
+                        Log.i("teste","teste insert8");
+                        dbReference.child(location).child(filter).child("Events").child(eventList[i].getId()).setValue(eventList[i]);
                     }
                 }
+
             }catch (Exception e) {
                 e.getStackTrace();
             }
