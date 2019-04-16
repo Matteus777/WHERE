@@ -83,6 +83,7 @@ public class ListActivity extends AppCompatActivity {
         //      public String cellEvent;
         int eventCount;
         int i;
+        int min;
         String url;
         private DatabaseReference firebaseDatabase;
         int currentEvent;
@@ -99,7 +100,6 @@ public class ListActivity extends AppCompatActivity {
             }
             try {
                 currentEvent=0;
-                Log.i("teste", "tempo: " + Calendar.getInstance().getTime().getTime() );
             //    Log.i("teste","time: "+Timestamp.parse("2019-04-15 14:00:00"));
                 for (j = 1; j < 30; j++) {
                     Log.i("teste","page"+j);
@@ -111,9 +111,24 @@ public class ListActivity extends AppCompatActivity {
                     }
                     Elements eventGrid = doc.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
                     int gridSize = eventGrid.size();
+                    Log.i("teste","a");
                     cellUrl = new String[gridSize];
                     for ( i = 0; i < gridSize; i++) {
+                        Elements singleEvent = doc.select("a.event-box-link").eq(i);
                         cellUrl[i] = doc.select("a.event-box-link").eq(i).attr("href");
+                        int eventDay = Integer.parseInt(singleEvent.select("div.calendar-day").text());
+                        int eventMonth = Integer.parseInt(getMonth(singleEvent.select("div.calendar-month").text()));
+                        int hour = Integer.parseInt(singleEvent.select("div.line").not(".uppercase").text().substring(0,2));
+                        int sec = 0;
+                        String checkMin = singleEvent.select("div.line").not(".uppercase").text().substring(3,4);
+                        checkMin = checkMin.replace(" ","");
+                        if(!checkMin.isEmpty()){
+                            min = Integer.parseInt(singleEvent.select("div.line").not(".uppercase").text().substring(3,5));
+                        }else{
+                            min = 00;
+                        }
+
+                        Log.i("teste",""+hour+" "+min+" "+sec);
                     }
                     for(final String cellEvent:cellUrl){
                         Log.i("teste_url",cellEvent);
@@ -122,15 +137,27 @@ public class ListActivity extends AppCompatActivity {
                             Elements eventNameElement = eventCell.select("h1.event-name");
                             Elements eventLocationElement = eventCell.normalise().select("div.event-info-city");
                             Elements eventDateElement = eventCell.normalise().select("div.event-info-calendar");
-
                             eventName = eventNameElement.text();
                             eventLocation = eventLocationElement.text();
                             eventDate = eventDateElement.text();
                             if(eventName.isEmpty()){
                                 eventName = eventCell.select("h1.uppercase").text();
                             }
-                            Log.i("teste",eventName);
+                            if(eventDate.isEmpty()){
+                                eventDate = eventCell.normalise().select("div.col-md-12").select("div").eq(0).select("div").eq(0).text();
 
+
+                            }
+
+                            int year = Calendar.getInstance().get(Calendar.YEAR);
+                            String hour = eventDate.substring(eventDate.indexOf(",")+1,24);
+                            if(hour.contains("h")|| hour.contains(" ")){
+                                hour = hour.replace("h","");
+                                hour = hour.replace(" ","");
+                            }
+
+                            String min = eventDate.substring(eventDate.indexOf(","),26);
+                            Log.i("teste",eventDateElement.text());
 
 
 
@@ -172,7 +199,7 @@ public class ListActivity extends AppCompatActivity {
                                     Elements eventPriceDoc1 = eventPrice.select("span").eq(0);
                                     priceObj[p].setLote(eventPriceDoc1.text());
                                     Log.i("teste",String.valueOf(eventPriceDoc1.text()));
-                                    eventList[currentEvent].setPrice(priceObj);
+
                                 }
                                 else {
                                     Elements checkID = eventCell.normalise().select("form#ticket-form").select("tr").eq(p);
@@ -201,32 +228,83 @@ public class ListActivity extends AppCompatActivity {
 
         private String getMonth(String month){
             switch(month){
-                case "janeiro":month = "1";
+                case "Jan":month = "1";
                     break;
-                case "fevereiro":month = "2";
+                case "Feb":month = "2";
                     break;
-                case "março":month ="3";
+                case "Mar":month ="3";
                     break;
-                case "abril":month = "4";
+                case "Abr":month = "4";
                     break;
-                case "maio":month = "5";
+                case "Mai":month = "5";
                     break;
-                case "junho":month = "6";
+                case "Jun":month = "6";
                     break;
-                case "julho":month = "7";
+                case "Jul":month = "7";
                     break;
-                case "agosto":month = "8";
+                case "Ago":month = "8";
                     break;
-                case "setembro":month = "9";
+                case "Set":month = "9";
                     break;
-                case "outubro":month = "10";
+                case "Out":month = "10";
                     break;
-                case "novembro":month = "11";
+                case "Nov":month = "11";
                     break;
-                case "dezembro":month = "12";
+                case "Dez":month = "12";
 
             }
             return month;
+        }
+        private String getMonthAgain(String month){
+            if(month.contains("janeiro")){
+                month = "janeiro";
+
+            }else{
+                if(month.contains("fevereiro")){
+                    month = "fevereiro";
+                }else{
+                    if(month.contains("março")){
+                        month = "março";
+                    }else{
+                        if(month.contains("abril")){
+                            month = "abril";
+                        }else{
+                            if(month.contains("maio")){
+                                month = "maio";
+                            }else{
+                                if(month.contains("junho")){
+                                    month = "junho";
+                                }else{
+                                    if(month.contains("julho")){
+                                        month = "julho";
+                                    }else{
+                                        if(month.contains("agosto")){
+                                            month = "agosto";
+                                        }else{
+                                            if(month.contains("setembro")){
+                                                month = "setembro";
+                                            }else{
+                                                if(month.contains("outubro")){
+                                                    month = "outubro";
+                                                }else{
+                                                    if(month.contains("novembro")){
+                                                        month = "novembro";
+                                                    }else{
+                                                            month = "dezembro";
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return getMonth(month);
         }
 
     }
