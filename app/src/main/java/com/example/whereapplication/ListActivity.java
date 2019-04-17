@@ -122,6 +122,24 @@ public class ListActivity extends AppCompatActivity {
                     for ( i = 0; i < gridSize; i++) {
                         Elements singleEvent = doc.select("a.event-box-link").eq(i);
                         cellUrl[i] = doc.select("a.event-box-link").eq(i).attr("href");
+                        Elements eventLocationElement = singleEvent.select("div.uppercase.line").select("p");
+                        Elements eventNameElement = singleEvent.select("div.event-name").select("p");
+                        eventLocation = eventLocationElement.text();
+                        eventName = eventNameElement.text();
+                        eventList[currentEvent].setTitle(eventName);
+                        eventList[currentEvent].setLocal(eventLocation);
+
+
+
+
+
+
+
+
+
+
+
+
                         int eventDay = Integer.parseInt(singleEvent.select("div.calendar-day").text());
                         int eventMonth = Integer.parseInt(getMonth(singleEvent.select("div.calendar-month").text()));
                         int hour = Integer.parseInt(singleEvent.select("div.line").not(".uppercase").text().substring(0,2));
@@ -136,27 +154,13 @@ public class ListActivity extends AppCompatActivity {
                         Calendar date = Calendar.getInstance();
                         date.set(2019, eventMonth-1,eventDay,hour,min);
                         dateStamp = new Timestamp(date.getTime().getTime());
-                        Log.i("teste",""+dateStamp.getTime());
-
+                        eventList[currentEvent].setDate(dateStamp);
+                        dbReference.child(location).child(filter).child(eventList[currentEvent].getTitle()).setValue(eventList[currentEvent]);
                     }
                     for(final String cellEvent:cellUrl){
                         Log.i("teste_url",cellEvent);
                         try {
-                            eventCell  = Jsoup.connect(cellEvent).get();
-                            Elements eventNameElement = eventCell.select("h1.event-name");
-                            Elements eventLocationElement = eventCell.normalise().select("div.event-info-city");
-                            Elements eventDateElement = eventCell.normalise().select("div.event-info-calendar");
-                            eventName = eventNameElement.text();
-                            eventLocation = eventLocationElement.text();
-                            eventDate = eventDateElement.text();
-                            if(eventName.isEmpty()){
-                                eventName = eventCell.select("h1.uppercase").text();
-                            }
-                            if(eventDate.isEmpty()){
-                                eventDate = eventCell.normalise().select("div.col-md-12").select("div").eq(0).select("div").eq(0).text();
 
-
-                            }
                             Elements eventPriceSizeElement = eventCell.select("form#ticket-form").select("tr");
                             eventPriceSize = eventPriceSizeElement.size();
 
@@ -185,7 +189,7 @@ public class ListActivity extends AppCompatActivity {
                                     priceObj[p-1].setValue(eventPriceNum);
                                     Elements eventPriceDoc1 = eventPrice.select("span").eq(0);
                                     priceObj[p].setLote(eventPriceDoc1.text());
-                                    Log.i("teste",String.valueOf(eventPriceDoc1.text()));
+                                    eventList[currentEvent].setPrice(priceObj);
 
                                 }
                                 else {
@@ -205,21 +209,7 @@ public class ListActivity extends AppCompatActivity {
                             }
                         }
 
-
                         currentEvent++;
-
-                    }
-                    for(int l = 0;l<eventList.length;l++) {
-                        Log.i("teste","teste insert");
-                        eventList[i].setDate(dateStamp);
-                        Log.i("teste","teste insert1");
-                        eventList[i].setTitle(eventName);
-                        Log.i("teste","teste insert3");
-                        eventList[i].setLocal(eventLocation);
-                        Log.i("teste","teste insert9");
-                        eventList[i].setId(UUID.randomUUID().toString());
-                        Log.i("teste","teste insert8");
-                        dbReference.child(location).child(filter).child("Events").child(eventList[i].getId()).setValue(eventList[i]);
                     }
                 }
 

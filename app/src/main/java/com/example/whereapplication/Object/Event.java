@@ -32,11 +32,6 @@ public class Event {
     public void setDesc(String desc) {
         this.desc = desc;
     }
-
-    private boolean tagopen;
-    private boolean tagfree;
-    private boolean tagshow;
-
     public String getLocal() {
         return local;
     }
@@ -44,8 +39,6 @@ public class Event {
     public void setLocal(String local) {
         this.local = local;
     }
-
-    private boolean tagfesta;
 
     public String getId() {
         return id;
@@ -78,37 +71,5 @@ public class Event {
 
     public void setDate(Timestamp date) {
         this.date = date;
-    }
-
-    public boolean isTagopen() {
-        return tagopen;
-    }
-
-    public void setTagopen(boolean tagopen) {
-        this.tagopen = tagopen;
-    }
-
-    public boolean isTagfree() {
-        return tagfree;
-    }
-
-    public void setTagfree(boolean tagfree) {
-        this.tagfree = tagfree;
-    }
-
-    public boolean isTagshow() {
-        return tagshow;
-    }
-
-    public void setTagshow(boolean tagshow) {
-        this.tagshow = tagshow;
-    }
-
-    public boolean isTagfesta() {
-        return tagfesta;
-    }
-
-    public void setTagfesta(boolean tagfesta) {
-        this.tagfesta = tagfesta;
     }
 }
