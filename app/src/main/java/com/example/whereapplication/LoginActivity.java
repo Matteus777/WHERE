@@ -28,12 +28,6 @@ import android.widget.Toast;
 
 import com.example.whereapplication.DAO.DAO;
 import com.example.whereapplication.Object.Event;
-import com.facebook.AccessToken;
-import com.facebook.AccessTokenTracker;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookSdk;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
 import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
@@ -55,7 +49,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
-    AccessToken accessToken;
     private FirebaseAuth auth;
     private FirebaseAuth.AuthStateListener authListener;
     final int RC_SIGN_IN = 123;
@@ -147,31 +140,42 @@ public class LoginActivity extends AppCompatActivity {
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
 
         } else {
+            Log.i("teste","aaab");
             ActivityCompat.requestPermissions(LoginActivity.this,
+
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     USER_LOCATION
             );
         }
         Geocoder geocoder;
         String bestProvider;
-        List<Address> user = null;
+        List<Address> user;
         double lat;
         double lng;
         LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
+
         bestProvider = lm.getBestProvider(criteria, false);
         Location location = lm.getLastKnownLocation(bestProvider);
+
+        Log.i("teste",""+location.getLongitude());
         if (location == null) {
             Toast.makeText(this, "Location Not found", Toast.LENGTH_LONG).show();
+
         } else {
+
             geocoder = new Geocoder(this);
             try {
                 String state;
-                user = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                Log.i("teste",""+location.getLatitude());
+                user = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),3);
+                Log.i("teste",""+user.get(0).getLatitude());
                 lat = (double) user.get(0).getLatitude();
+
                 lng = (double) user.get(0).getLongitude();
                 city  = user.get(0).getSubAdminArea();
                 state = user.get(0).getAdminArea();
+
                 Log.i("logtest",user.get(0).getAdminArea());
                 switch (state){
                     case "Acre":

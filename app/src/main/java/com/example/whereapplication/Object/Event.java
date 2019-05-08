@@ -6,22 +6,23 @@ import android.os.health.TimerStat;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class Event {
     private String local;
     private String id;
-    private Price[] price;
+    private List<Price> price;
     private String title;
     private Image photo;
     private Timestamp date;
     private String desc;
 
-    public Price[] getPrice() {
+    public List getPrice() {
         return price;
     }
 
-    public void setPrice(Price[] price) {
+    public void setPrice(List price) {
         this.price = price;
     }
 
@@ -32,6 +33,7 @@ public class Event {
     public void setDesc(String desc) {
         this.desc = desc;
     }
+
     public String getLocal() {
         return local;
     }
