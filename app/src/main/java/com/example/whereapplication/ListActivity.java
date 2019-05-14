@@ -1,6 +1,7 @@
 package com.example.whereapplication;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,12 +27,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Array;
@@ -66,6 +70,7 @@ public class ListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_list);
         database = FirebaseDatabase.getInstance();
         dbReference = FirebaseDatabase.getInstance().getReference();
+
         Intent intent = getIntent();
         extras = intent.getExtras();
         location = extras.getString("location");
@@ -76,6 +81,7 @@ public class ListActivity extends AppCompatActivity {
     public class Search extends AsyncTask<Void, Void, Void> {
         String eventLocation;
         String eventName;
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         String eventDate;
         String[] cellUrl;
         String filter;
@@ -103,7 +109,7 @@ public class ListActivity extends AppCompatActivity {
         @Override
         public Void doInBackground(Void... voids) {
             firebaseDatabase = FirebaseDatabase.getInstance().getReference();
-            filter = "musica";
+            filter = "rock";
             for(int p = 0;p<630;p++){
                Event e = new Event();
                 eventList[p]=e;
@@ -129,9 +135,15 @@ public class ListActivity extends AppCompatActivity {
                     int cont = currentEvent;
                     for ( i = 0; i < gridSize; i++) {
                         Elements singleEvent = doc.select("a.event-box-link").eq(i);
+                        String image = singleEvent.select("div.event-image-box").attr("style");
+                        image = image.substring(22,71);
+                        Uri.fromFile(new File(image));
+
+                        Log.i("imagem_",image);
                         cellUrl[i] = doc.select("a.event-box-link").eq(i).attr("href");
                         Elements eventLocationElement = singleEvent.select("div.uppercase.line").select("p");
                         Elements eventNameElement = singleEvent.select("div.event-name").select("p");
+
                         eventLocation = eventLocationElement.text();
                         eventName = eventNameElement.text();
                         Log.i("teste",eventLocation);
@@ -145,6 +157,9 @@ public class ListActivity extends AppCompatActivity {
                         }
                         if(eventName.contains("/")){
                             eventName = eventName.replace("/","-");
+                        }
+                        if(eventName.contains(".")){
+                            eventName = eventName.replace(".","-");
                         }
 
                         eventList[cont].setTitle(eventName);
@@ -188,12 +203,6 @@ public class ListActivity extends AppCompatActivity {
 
                     }
 
-
-
-
-
-
-
                     for(String cellEvent:cellUrl){
 
                         Log.i("teste_url",cellEvent);
@@ -210,17 +219,14 @@ public class ListActivity extends AppCompatActivity {
                             priceObj[p]=price;
                         }
                         for( p = 1; p<eventPriceSize;p++) {
-
+                            Log.i("teste_p",eventPriceSize+"");
                             double eventPriceNum;
                             Elements eventPriceCheck = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td.opt-panel");
 
                             if(eventPriceCheck.text().contains("Esgotado")||eventPriceCheck.text().contains("Encerrado")||eventPriceCheck.text().contains("Não iniciado")){
-                            priceObj[p-1].setValue(0);
+                                Log.i("teste_p",p+"esgotado");
+                                priceObj[p-1].setValue(0);
                             priceObj[p-1].setLote("Nao disponivel");
-
-
-
-
 
                             }
                             else {
@@ -239,9 +245,10 @@ public class ListActivity extends AppCompatActivity {
                                     Log.i("teste_lote gratis",""+priceObj[p].getLote()+" "+priceObj[p].getValue());
                                 }
                                 else {
-
+                                    Log.i("teste_p",p+"n esgotado");
                                     Elements checkID = eventCell.normalise().select("form#ticket-form").select("tr").eq(p);
                                     if(checkID.attr("id").equals("show-discount")||checkID.attr("id").equals("discount-form")){
+                                        break;
                                     }else{
                                         Elements eventPriceExists = checkID.select("td").eq(0).select("span").eq(1);
                                         String price = eventPriceExists.text().substring(3);
@@ -255,7 +262,8 @@ public class ListActivity extends AppCompatActivity {
 
                                         priceObj[p-1].setValue(eventPriceNum);
                                         Elements eventPriceDoc1 = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0).select("span").eq(0);
-                                        priceObj[p-1].setLote(eventPriceDoc1.text());
+                                        String nome = eventPriceDoc1.text();
+                                        priceObj[p-1].setLote(nome);
 
 //                                        List prices = Arrays.asList(priceObj);
 //                                        eventList[currentEvent].setPrice(prices);
@@ -278,7 +286,9 @@ public class ListActivity extends AppCompatActivity {
 
                         eventList[currentEvent].setTitle(eventList[currentEvent].getTitle().replace("#",""));
                         Log.i("teste_titulo",eventList[currentEvent].getTitle());
-                        dbReference.child(location).child(filter).child(eventList[currentEvent].getTitle()).setValue(eventList[currentEvent].getLocal());
+                        Log.i("teste_data",eventList[currentEvent].getDate()+"");
+                        Log.i("teste_local",eventList[currentEvent].getLocal());
+                        dbReference.child(location).child(filter).child(eventList[currentEvent].getTitle()).setValue(eventList[currentEvent]);
 
                         currentEvent++;
                     }
@@ -290,8 +300,6 @@ public class ListActivity extends AppCompatActivity {
             }
             return null; }
                         }
-
-
 
         private String getMonth(String month){
             switch(month){
