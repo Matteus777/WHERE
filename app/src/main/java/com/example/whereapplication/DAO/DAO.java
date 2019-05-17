@@ -13,10 +13,7 @@ public class DAO {
 
 
     public static void insertEvent(Context context, FirebaseDatabase database, DatabaseReference dbReference, Event event) {
-        FirebaseApp.initializeApp(context);
-        database = FirebaseDatabase.getInstance();
-        event.setId(UUID.randomUUID().toString());
-        dbReference.child("event").child(event.getId()).setValue(event);
+
 
 
     }

@@ -1,68 +1,101 @@
-//
-//package com.example.whereapplication.Adapter;
-//import android.app.Activity;
-//import android.os.Bundle;
-//import android.os.PersistableBundle;
-//import com.example.whereapplication.R;
-//import android.provider.CalendarContract;
-//import android.support.v7.app.AppCompatActivity;
-//import android.view.View;
-//import android.view.ViewGroup;
-//import android.widget.BaseAdapter;
-//import android.widget.ImageView;
-//import android.widget.TextView;
-//
-//import com.example.whereapplication.Object.Event;
-//import java.util.List;
-//
-//public  class AdapterList extends BaseAdapter {
-//    private final List<Event> events;
-//    private final Activity act;
-//
-//    private TextView local;
-//    private TextView preco;
-//    private TextView titulo;
-//    private TextView data;
-//    private ImageView imagem;
-//    public AdapterList (List<Event> events, Activity act) {
-//        this.events = events;
-//        this.act = act;
-//
-//    }
-//
-//    @Override
-//    public int getCount() {
-//        return events.size();
-//    }
-//
-//    @Override
-//    public Object getItem(int position) {
-//        return events.get(position);
-//    }
-//
-//    @Override
-//    public long getItemId(int position) {
-//        return 0;
-//    }
-//
-//    @Override
-//    public View getView(int position, View convertView, ViewGroup parent) {
-//        View view = act.getLayoutInflater().inflate(R.layout.list_adpter,parent,false);
-//        Event event = events.get(position);
-//        titulo = view.findViewById(R.id.list_adpter_title);
-//        data = view.findViewById(R.id.list_adpter_date);
-//        preco = view.findViewById(R.id.list_adpter_price);
-//        local = view.findViewById(R.id.list_adpter_localization);
-//        imagem = view.findViewById(R.id.list_adpter_image);
-//
-//
-//        //populando as Views
-//        titulo.setText(event.getTitle());
-//        preco.setText(String.valueOf(event.getPrice()));
-//        data.setText(event.getDate());
-//        local.setText(event.getLocal());
-//        imagem.setImageBitmap(R.drawable.java);
-//        return view;
-//    }
-//}
-//
+
+package com.example.whereapplication.Adapter;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.example.whereapplication.Object.Event;
+import com.example.whereapplication.Object.Price;
+import com.example.whereapplication.R;
+
+import java.util.List;
+
+public  class AdapterList extends RecyclerView.Adapter<AdapterList.ViewHolderEvent> {
+    private List<Event> list;
+
+    public AdapterList(List<Event> dados){
+        this.list = dados;
+    }
+
+
+
+
+
+    @NonNull
+    @Override
+    public AdapterList.ViewHolderEvent onCreateViewHolder(ViewGroup parent, int viewType) {
+        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+
+        View view = layoutInflater.inflate(R.layout.list_adpter,parent,false);
+
+        ViewHolderEvent holderEvent = new ViewHolderEvent(view);
+        return holderEvent;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull AdapterList.ViewHolderEvent viewHolder, int i) {
+        if(list!=null&&list.size()>0) {
+            Log.i("cgnotas",i+"");
+            Event event = list.get(i);
+            viewHolder.tvTitle.setText(event.getTitle());
+            viewHolder.tvDate.setText(event.getRealDate().getTime().toString());
+            viewHolder.tvLocation.setText(event.getLocal());
+            double menor = 99999999;
+            for(int j = 0;j<event.getPrice().size();j++){
+                Object price = event.getPrice().get(j);
+                Price p = (Price) price;
+                if(p.getLote().equals("Nao disponivel")){
+                    continue;
+                }
+
+                if(p.getValue()<menor){
+                    viewHolder.tvPrice.setText("R$ "+String.valueOf(p.getValue()));
+                    viewHolder.tvLote.setText(p.getLote());
+                }
+                  menor = p.getValue();
+
+            }
+        }
+
+
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return list.size();
+    }
+
+    public class ViewHolderEvent extends RecyclerView.ViewHolder{
+
+        public ImageView ivImage;
+        public TextView tvTitle;
+        public TextView tvLocation;
+        public TextView tvPrice;
+        public TextView tvDate;
+        public TextView tvLote;
+
+
+        public ViewHolderEvent(@NonNull View itemView) {
+            super(itemView);
+
+            ivImage = itemView.findViewById(R.id.ivImage);
+            tvTitle = itemView.findViewById(R.id.tvTitle);
+            tvLocation = itemView.findViewById(R.id.tvLocation);
+            tvPrice = itemView.findViewById(R.id.tvPrice);
+            tvDate = itemView.findViewById(R.id.tvDate);
+            tvLote = itemView.findViewById(R.id.tvLote);
+
+
+        }
+
+
+
+    }
+}
+
