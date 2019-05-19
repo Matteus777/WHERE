@@ -77,7 +77,6 @@ public class ListActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     private AdapterList adapterList;
     String filter;
-
     DatabaseReference saveReference;
     List<Event> eventList;
     ProgressBar progressBar;
@@ -93,8 +92,8 @@ public class ListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        filter = "funk";
-        progressBar = findViewById(R.id.progressLoader);
+        filter = "teatro";
+
 
 
         setContentView(R.layout.activity_list);
@@ -104,7 +103,7 @@ public class ListActivity extends AppCompatActivity {
         extras = intent.getExtras();
         location = extras.getString("location");
         saveReference = database.getReference("/" + location + "/" + filter);
-
+        progressBar = findViewById(R.id.progressLoader);
 
         recyclerView = findViewById(R.id.recyclerList);
         recyclerView.setHasFixedSize(true);
@@ -114,15 +113,9 @@ public class ListActivity extends AppCompatActivity {
         saveReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
                 if(!dataSnapshot.exists()){
-                    progressBar.setVisibility(VISIBLE);
                     new Search().execute();
                 }
-
-
-
-
             }
 
             @Override
@@ -135,19 +128,14 @@ public class ListActivity extends AppCompatActivity {
 
         }
 
-    Thread t =  new Thread(new Runnable() {
-        @Override
-        public void run() {
+   public void getEvents(){
             DatabaseReference listenerReference = database.getReference().child(location).child(filter);
             listenerReference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-
                         Event e = Event.get(snapshot);
                         eventList.add(e);
-
-
                         adapterList = new AdapterList(eventList);
                         recyclerView.setAdapter(adapterList);
 
@@ -162,22 +150,19 @@ public class ListActivity extends AppCompatActivity {
                 }
             });
         }
-    });
-
     public class Search extends AsyncTask<Void, Void, Void> {
+
         String eventLocation;
         String eventName;
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         String eventDate;
         String[] cellUrl;
-
         int eventPriceSize;
         Document doc;
         int j;
         Elements eventGrid;
         int p;
         Document eventCell;
-        int w;
         public TextView tvFilter;
         //      public String cellEvent;
         int eventCount;
@@ -193,11 +178,12 @@ public class ListActivity extends AppCompatActivity {
         String image;
 
 
-
+        @Override
+        protected void onPreExecute() {
+            progressBar.setVisibility(View.VISIBLE);
+        }
         @Override
         public Void doInBackground(Void... voids) {
-            progressBar = findViewById(progressLoader);
-
             for(int p = 0;p<630;p++){
                Event e = new Event();
                 eventList[p]=e;
@@ -210,8 +196,6 @@ public class ListActivity extends AppCompatActivity {
                     url = "https://www.sympla.com.br/eventos/"+location+"?s="+filter+"&pagina="+j;
                     Log.i("teste_main",url);
                     doc = Jsoup.connect(url).get();
-
-
                     Elements ifExists = doc.normalise().select("h3[class=pull-left]");
                     if (!ifExists.isEmpty()) {
                         break;
@@ -220,35 +204,24 @@ public class ListActivity extends AppCompatActivity {
                     gridSize = eventGrid.size();
                     Log.i("teste_gridsize",""+gridSize);
                     cellUrl = new String[gridSize];
-
                     int cont = currentEvent;
                     for ( i = 0; i < gridSize; i++) {
-
                         Elements singleEvent = doc.select("a.sympla-card").eq(i);
-
                         image = singleEvent.select("div.event--image").attr("style");
                         if(!image.contains("default")){
                             image = image.substring(23,72);
                         }
-
-
-
-
                         cellUrl[i] = doc.select("a.sympla-card").eq(i).attr("href");
-
                         Elements eventLocationElement = singleEvent.select("div.event-location");
                         Elements eventNameElement = singleEvent.select("div.event-name").select("span");
-
                         eventLocation = eventLocationElement.text();
                         eventName = eventNameElement.text();
                         Log.i("teste",eventLocation+" "+eventName+ " "+image);
-
                         if (eventName.contains("&")) {
                             eventName = eventName.replace("&", "And");
                         }
                         if (eventName.contains("@")) {
                             eventName = eventName.replace("@"," ");
-
                         }
                         if(eventName.contains("/")){
                             eventName = eventName.replace("/","-");
@@ -256,7 +229,6 @@ public class ListActivity extends AppCompatActivity {
                         if(eventName.contains(".")){
                             eventName = eventName.replace(".","-");
                         }
-
                         eventList[cont].setTitle(eventName);
                         eventList[cont].setLocal(eventLocation);
                         int eventDay = Integer.parseInt(singleEvent.select("div.event-date-day").text());
@@ -269,7 +241,6 @@ public class ListActivity extends AppCompatActivity {
                             hour = Calendar.getInstance().get(Calendar.HOUR);
                         }
                         int sec = 0;
-
                             min = Integer.parseInt(hourElement.text().substring(3,5));
                             if(happening) {
                                 min = Calendar.getInstance().get(Calendar.MINUTE);
@@ -282,11 +253,8 @@ public class ListActivity extends AppCompatActivity {
                         eventList[cont].setPhoto(image);
                         eventList[cont].setDate(dateStamp);
                         cont++;
-
                     }
-
                     for(String cellEvent:cellUrl){
-
                         Log.i("teste_url",cellEvent);
                         try {
                             eventCell = Jsoup.connect(cellEvent).get();
@@ -315,7 +283,6 @@ public class ListActivity extends AppCompatActivity {
                                 Elements eventPrice = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0);
                                 String free = eventPrice.text().toLowerCase();
                                 free =  LoginActivity.removeAccents(free);
-
 //                                        Log.i("teste",free);
                                 if (free.contains("gratis")) {
                                     eventPriceNum = 0;
@@ -338,45 +305,33 @@ public class ListActivity extends AppCompatActivity {
                                         if(price.indexOf(".")<price.lastIndexOf(".")){
                                             price = price.substring(0,price.lastIndexOf("."));
                                         }
-
                                         Log.i("teste",""+price);
                                         eventPriceNum = Double.valueOf(price);
-
                                         priceObj[p-1].setValue(eventPriceNum);
                                         Elements eventPriceDoc1 = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0).select("span").eq(0);
                                         String nome = eventPriceDoc1.text();
                                         priceObj[p-1].setLote(nome);
-
 //                                        List prices = Arrays.asList(priceObj);
 //                                        eventList[currentEvent].setPrice(prices);
-
                                         Log.i("teste_LOte e Preco",""+priceObj[p-1].getLote()+" "+priceObj[p-1].getValue());
-
                                     }
-
-
                                 }
-
                             }
                             List prices = Arrays.asList(priceObj);
                             eventList[currentEvent].setPrice(prices);
                             Log.i("teste",priceObj[p-1].getLote());
-
-
                         }
                         Log.i("teste_evento",""+currentEvent);
-
                         eventList[currentEvent].setTitle(eventList[currentEvent].getTitle().replace("#",""));
                         Log.i("teste_titulo",eventList[currentEvent].getTitle());
                         Log.i("teste_data",eventList[currentEvent].getDate()+"");
                         Log.i("teste_local",eventList[currentEvent].getLocal());
                         dbReference.child(location).child(filter).child(eventList[currentEvent].getTitle()).setValue(eventList[currentEvent]);
-
                         currentEvent++;
                     }
-
                 }
-                t.start();
+                getEvents();
+                progressBar.setVisibility(INVISIBLE);
             }catch (Exception e) {
                 e.getStackTrace();
             }
