@@ -1,20 +1,33 @@
 package com.example.whereapplication;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ThemedSpinnerAdapter;
 import android.widget.Toast;
-import android.widget.Toolbar;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.example.whereapplication.Adapter.AdapterList;
 import com.example.whereapplication.Object.Event;
 import com.example.whereapplication.DAO.DAO;
 import com.example.whereapplication.Object.Event;
@@ -26,12 +39,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Array;
@@ -46,6 +62,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+import static com.example.whereapplication.R.id.progressLoader;
+
 
 public class ListActivity extends AppCompatActivity {
     FirebaseDatabase database;
@@ -58,34 +78,96 @@ public class ListActivity extends AppCompatActivity {
     TextView tvAddress;
     Bundle extras;
     String location;
+    RecyclerView recyclerView;
+    private AdapterList adapterList;
+    String filter;
+    DatabaseReference saveReference;
+    List<Event> eventList;
+    ProgressBar progressBar;
+    Handler handler = new Handler();
+    int i = 0;
+    int gridSize;
+    Toolbar myToolBar;
+
+
+
+
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_list);
+        myToolBar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(myToolBar);
+        filter = "teatro";
         database = FirebaseDatabase.getInstance();
         dbReference = FirebaseDatabase.getInstance().getReference();
         Intent intent = getIntent();
         extras = intent.getExtras();
         location = extras.getString("location");
-        new Search().execute();
+        saveReference = database.getReference("/" + location + "/" + filter);
+        progressBar = findViewById(R.id.progressLoader);
+        recyclerView = findViewById(R.id.recyclerList);
+        recyclerView.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        eventList = new ArrayList<>();
+        saveReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){
+                    new Search().execute();
+                }
+            }
 
-    }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
+            }
+
+        });
+
+
+        }
+
+   public void getEvents(){
+            DatabaseReference listenerReference = database.getReference().child(location).child(filter);
+            listenerReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                        Event e = Event.get(snapshot);
+                        eventList.add(e);
+                        adapterList = new AdapterList(eventList);
+                        recyclerView.setAdapter(adapterList);
+
+//
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
     public class Search extends AsyncTask<Void, Void, Void> {
+
         String eventLocation;
         String eventName;
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         String eventDate;
         String[] cellUrl;
-        String filter;
         int eventPriceSize;
         Document doc;
         int j;
         Elements eventGrid;
         int p;
         Document eventCell;
-        int w;
         public TextView tvFilter;
         //      public String cellEvent;
         int eventCount;
@@ -98,12 +180,15 @@ public class ListActivity extends AppCompatActivity {
         int currentEvent;
         Event[]eventList  = new Event[630];
         String checkMin;
+        String image;
 
 
         @Override
+        protected void onPreExecute() {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+        @Override
         public Void doInBackground(Void... voids) {
-            firebaseDatabase = FirebaseDatabase.getInstance().getReference();
-            filter = "musica";
             for(int p = 0;p<630;p++){
                Event e = new Event();
                 eventList[p]=e;
@@ -114,88 +199,67 @@ public class ListActivity extends AppCompatActivity {
                 for (j = 1; j < 30; j++) {
                     Log.i("teste_page","page"+j);
                     url = "https://www.sympla.com.br/eventos/"+location+"?s="+filter+"&pagina="+j;
+                    Log.i("teste_main",url);
                     doc = Jsoup.connect(url).get();
-
-
                     Elements ifExists = doc.normalise().select("h3[class=pull-left]");
                     if (!ifExists.isEmpty()) {
                         break;
                     }
-                    Elements eventGrid = doc.select("div[class=col-xs-12 col-sm-6 col-md-4 single-event-box]");
-                    int gridSize = eventGrid.size();
+                    Elements eventGrid = doc.select("li.search-result-li");
+                    gridSize = eventGrid.size();
                     Log.i("teste_gridsize",""+gridSize);
                     cellUrl = new String[gridSize];
-
                     int cont = currentEvent;
                     for ( i = 0; i < gridSize; i++) {
-                        Elements singleEvent = doc.select("a.event-box-link").eq(i);
-                        cellUrl[i] = doc.select("a.event-box-link").eq(i).attr("href");
-                        Elements eventLocationElement = singleEvent.select("div.uppercase.line").select("p");
-                        Elements eventNameElement = singleEvent.select("div.event-name").select("p");
+                        Elements singleEvent = doc.select("a.sympla-card").eq(i);
+                        image = singleEvent.select("div.event--image").attr("style");
+                        if(!image.contains("default")){
+                            image = image.substring(23,72);
+                        }
+                        cellUrl[i] = doc.select("a.sympla-card").eq(i).attr("href");
+                        Elements eventLocationElement = singleEvent.select("div.event-location");
+                        Elements eventNameElement = singleEvent.select("div.event-name").select("span");
                         eventLocation = eventLocationElement.text();
                         eventName = eventNameElement.text();
-                        Log.i("teste",eventLocation);
-
+                        Log.i("teste",eventLocation+" "+eventName+ " "+image);
                         if (eventName.contains("&")) {
                             eventName = eventName.replace("&", "And");
                         }
                         if (eventName.contains("@")) {
                             eventName = eventName.replace("@"," ");
-
                         }
                         if(eventName.contains("/")){
                             eventName = eventName.replace("/","-");
                         }
-
+                        if(eventName.contains(".")){
+                            eventName = eventName.replace(".","-");
+                        }
                         eventList[cont].setTitle(eventName);
                         eventList[cont].setLocal(eventLocation);
-                        int eventDay = Integer.parseInt(singleEvent.select("div.calendar-day").text());
-                        int eventMonth = Integer.parseInt(getMonth(singleEvent.select("div.calendar-month").text()));
-                        boolean happening;
-                        Elements hourElement = singleEvent.select("div.line").not(".uppercase");
+                        int eventDay = Integer.parseInt(singleEvent.select("div.event-date-day").text());
+                        int eventMonth = Integer.parseInt(getMonth(singleEvent.select("div.event-card-date-month").text()));
+                        boolean happening = false;
+                        Elements hourElement = singleEvent.select("div.event-card-info");
+                        hour = Integer.parseInt(hourElement.text().substring(0, 2));
                         if(hourElement.text().contains("andamento")){
                             happening = true;
                             hour = Calendar.getInstance().get(Calendar.HOUR);
-                        }else {
-                            happening = false;
-                            hour = Integer.parseInt(hourElement.text().substring(0, 2));
                         }
                         int sec = 0;
-                        Elements checkMinElement = singleEvent.select("div.line").not(".uppercase");
-                        if(checkMinElement.text().length()<=3){
-                            min=0;
-                        }else {
-                            checkMin = checkMinElement.text().substring(3, 4);
-                        }
-                            checkMin = checkMin.replace(" ", "");
-                            if(!checkMin.isEmpty()){
-                            if(happening){
+                            min = Integer.parseInt(hourElement.text().substring(3,5));
+                            if(happening) {
                                 min = Calendar.getInstance().get(Calendar.MINUTE);
-                            }else {
-                                min = Integer.parseInt(singleEvent.select("div.line").not(".uppercase").text().substring(3, 5));
-
                             }
-                        }else{
-                            min = 0;
-                        }
+                            Log.i("teste_hora",""+ eventDay+" "+eventMonth+" "+hour+" "+min+" "+ sec);
                         Calendar date = Calendar.getInstance();
                         date.set(date.get(Calendar.YEAR), eventMonth,eventDay,hour,min);
                         dateStamp = new Timestamp(date.getTime().getTime());
                         Log.i("teste",date.getTime()+"");
-
+                        eventList[cont].setPhoto(image);
                         eventList[cont].setDate(dateStamp);
                         cont++;
-
                     }
-
-
-
-
-
-
-
                     for(String cellEvent:cellUrl){
-
                         Log.i("teste_url",cellEvent);
                         try {
                             eventCell = Jsoup.connect(cellEvent).get();
@@ -210,24 +274,20 @@ public class ListActivity extends AppCompatActivity {
                             priceObj[p]=price;
                         }
                         for( p = 1; p<eventPriceSize;p++) {
-
+                            Log.i("teste_p",eventPriceSize+"");
                             double eventPriceNum;
                             Elements eventPriceCheck = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td.opt-panel");
 
                             if(eventPriceCheck.text().contains("Esgotado")||eventPriceCheck.text().contains("Encerrado")||eventPriceCheck.text().contains("Não iniciado")){
-                            priceObj[p-1].setValue(0);
+                                Log.i("teste_p",p+"esgotado");
+                                priceObj[p-1].setValue(0);
                             priceObj[p-1].setLote("Nao disponivel");
-
-
-
-
 
                             }
                             else {
                                 Elements eventPrice = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0);
                                 String free = eventPrice.text().toLowerCase();
                                 free =  LoginActivity.removeAccents(free);
-
 //                                        Log.i("teste",free);
                                 if (free.contains("gratis")) {
                                     eventPriceNum = 0;
@@ -239,9 +299,10 @@ public class ListActivity extends AppCompatActivity {
                                     Log.i("teste_lote gratis",""+priceObj[p].getLote()+" "+priceObj[p].getValue());
                                 }
                                 else {
-
+                                    Log.i("teste_p",p+"n esgotado");
                                     Elements checkID = eventCell.normalise().select("form#ticket-form").select("tr").eq(p);
                                     if(checkID.attr("id").equals("show-discount")||checkID.attr("id").equals("discount-form")){
+                                        break;
                                     }else{
                                         Elements eventPriceExists = checkID.select("td").eq(0).select("span").eq(1);
                                         String price = eventPriceExists.text().substring(3);
@@ -249,49 +310,38 @@ public class ListActivity extends AppCompatActivity {
                                         if(price.indexOf(".")<price.lastIndexOf(".")){
                                             price = price.substring(0,price.lastIndexOf("."));
                                         }
-
                                         Log.i("teste",""+price);
                                         eventPriceNum = Double.valueOf(price);
-
                                         priceObj[p-1].setValue(eventPriceNum);
                                         Elements eventPriceDoc1 = eventCell.normalise().select("form#ticket-form").select("tr").eq(p).select("td").eq(0).select("span").eq(0);
-                                        priceObj[p-1].setLote(eventPriceDoc1.text());
-
+                                        String nome = eventPriceDoc1.text();
+                                        priceObj[p-1].setLote(nome);
 //                                        List prices = Arrays.asList(priceObj);
 //                                        eventList[currentEvent].setPrice(prices);
-
                                         Log.i("teste_LOte e Preco",""+priceObj[p-1].getLote()+" "+priceObj[p-1].getValue());
-
                                     }
-
-
                                 }
-
                             }
                             List prices = Arrays.asList(priceObj);
                             eventList[currentEvent].setPrice(prices);
                             Log.i("teste",priceObj[p-1].getLote());
-
-
                         }
                         Log.i("teste_evento",""+currentEvent);
-
                         eventList[currentEvent].setTitle(eventList[currentEvent].getTitle().replace("#",""));
                         Log.i("teste_titulo",eventList[currentEvent].getTitle());
-                        dbReference.child(location).child(filter).child(eventList[currentEvent].getTitle()).setValue(eventList[currentEvent].getLocal());
-
+                        Log.i("teste_data",eventList[currentEvent].getDate()+"");
+                        Log.i("teste_local",eventList[currentEvent].getLocal());
+                        dbReference.child(location).child(filter).child(eventList[currentEvent].getTitle()).setValue(eventList[currentEvent]);
                         currentEvent++;
                     }
-
                 }
-
+                getEvents();
+                progressBar.setVisibility(INVISIBLE);
             }catch (Exception e) {
                 e.getStackTrace();
             }
             return null; }
                         }
-
-
 
         private String getMonth(String month){
             switch(month){
