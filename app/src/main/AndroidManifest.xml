@@ -17,28 +17,28 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+
+
         <activity android:name=".ScrapinActivity"></activity>
         <activity android:name=".LoginActivity">
+
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+
+
+
+
+
             </intent-filter>
+
         </activity>
         <activity android:name=".CellActivity" />
         <activity android:name=".ListActivity" />
         <activity android:name=".WelcomeActivity" />
-
-        <meta-data
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_application_id" />
-
-        <provider
-            android:name="com.facebook.FacebookContentProvider"
-            android:authorities="com.facebook.app.FacebookContentProvider371542457033860"
-            android:exported="true" />
     </application>
 
 </manifest>

@@ -1,25 +1,29 @@
 package com.example.whereapplication;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ThemedSpinnerAdapter;
 import android.widget.Toast;
-import android.widget.Toolbar;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -83,6 +87,8 @@ public class ListActivity extends AppCompatActivity {
     Handler handler = new Handler();
     int i = 0;
     int gridSize;
+    Toolbar myToolBar;
+
 
 
 
@@ -92,11 +98,11 @@ public class ListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        filter = "teatro";
-
-
 
         setContentView(R.layout.activity_list);
+        myToolBar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(myToolBar);
+        filter = "teatro";
         database = FirebaseDatabase.getInstance();
         dbReference = FirebaseDatabase.getInstance().getReference();
         Intent intent = getIntent();
@@ -104,7 +110,6 @@ public class ListActivity extends AppCompatActivity {
         location = extras.getString("location");
         saveReference = database.getReference("/" + location + "/" + filter);
         progressBar = findViewById(R.id.progressLoader);
-
         recyclerView = findViewById(R.id.recyclerList);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
