@@ -86,7 +86,7 @@ public  class AdapterList extends RecyclerView.Adapter<AdapterList.ViewHolderEve
 
             ivImage = itemView.findViewById(R.id.ivImage);
             tvTitle = itemView.findViewById(R.id.tvTitle);
-            tvLocation = itemView.findViewById(R.id.tvLocation);
+            tvLocation = itemView.findViewById(R.id.tvAddress);
             tvPrice = itemView.findViewById(R.id.tvPrice);
             tvDate = itemView.findViewById(R.id.tvDate);
             tvLote = itemView.findViewById(R.id.tvLote);

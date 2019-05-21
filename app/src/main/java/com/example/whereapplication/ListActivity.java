@@ -1,5 +1,6 @@
 package com.example.whereapplication;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -12,13 +13,19 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -41,6 +48,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -76,6 +84,8 @@ public class ListActivity extends AppCompatActivity {
     TextView tvPrice;
     TextView tvDate;
     TextView tvAddress;
+    EditText etLocation;
+    EditText etSearch;
     Bundle extras;
     String location;
     RecyclerView recyclerView;
@@ -90,10 +100,13 @@ public class ListActivity extends AppCompatActivity {
     Toolbar myToolBar;
 
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
 
+        getMenuInflater().inflate(R.menu.navigation, menu);
 
-
-
+        return super.onCreateOptionsMenu(menu);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,12 +115,22 @@ public class ListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_list);
         myToolBar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(myToolBar);
-        filter = "teatro";
+        tvTitle = findViewById(R.id.tvTitle);
+        tvDate = findViewById(R.id.tvDate);
+        tvPrice = findViewById(R.id.tvPrice);
+        tvAddress = findViewById(R.id.tvAddress);
+        etSearch = findViewById(R.id.etSearch);
+        etLocation = findViewById(R.id.etLocation);
+        etLocation.setText(location);
+
+        filter = etSearch.getText().toString();
         database = FirebaseDatabase.getInstance();
         dbReference = FirebaseDatabase.getInstance().getReference();
         Intent intent = getIntent();
         extras = intent.getExtras();
         location = extras.getString("location");
+        etLocation.setText(location);
+        filter = etSearch.getText().toString();
         saveReference = database.getReference("/" + location + "/" + filter);
         progressBar = findViewById(R.id.progressLoader);
         recyclerView = findViewById(R.id.recyclerList);
@@ -118,9 +141,10 @@ public class ListActivity extends AppCompatActivity {
         saveReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.exists()){
+                if(!dataSnapshot.exists()) {
                     new Search().execute();
                 }
+                getEvents();
             }
 
             @Override
@@ -133,16 +157,56 @@ public class ListActivity extends AppCompatActivity {
 
         }
 
+
+
+
+
    public void getEvents(){
+
+        eventList.clear();
             DatabaseReference listenerReference = database.getReference().child(location).child(filter);
+
+            listenerReference.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String s) {
+                    Event e = Event.get(snapshot);
+                    eventList.add(e);
+                    adapterList = new AdapterList(eventList);
+                    recyclerView.setAdapter(adapterList);
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
             listenerReference.addValueEventListener(new ValueEventListener() {
+
+
+
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-                        Event e = Event.get(snapshot);
-                        eventList.add(e);
-                        adapterList = new AdapterList(eventList);
-                        recyclerView.setAdapter(adapterList);
+//                        Event e = Event.get(snapshot);
+//                        eventList.add(e);
+//                        adapterList = new AdapterList(eventList);
+//                        recyclerView.setAdapter(adapterList);
 
 //
                     }
