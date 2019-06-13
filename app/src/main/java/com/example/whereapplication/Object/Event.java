@@ -46,7 +46,7 @@ public class Event {
         Calendar date = Calendar.getInstance();
         date.setTime(s);
         event.setRealDate( date );
-         List<Price> listPrice = new ArrayList<>();
+        List<Price> listPrice = new ArrayList<>();
         for( DataSnapshot snap:snapshot.child( "price" ).getChildren()){
             Price p = new Price();
             Object objLote = snap.child ( "lote" ).getValue();
@@ -64,7 +64,7 @@ public class Event {
             p.setLote( lote );
             listPrice.add( p );
         }
-
+        event.setPhoto((String)snapshot.child("photo").getValue());
         event.setPrice(listPrice);
         event.setLocal((String)snapshot.child("local").getValue());
         return event;

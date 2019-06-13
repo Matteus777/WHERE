@@ -8,26 +8,19 @@
     app:contentInsetStart="0dp"
     app:contentInsetEnd="0dp"
     app:contentInsetLeft="0dp"
-    app:logo="@mipmap/ic_action_icon_menor">
+    app:logo="@mipmap/ic_action_icon_menor"
+    >
 
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
-    <EditText
-        android:layout_margin="10dp"
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:textSize="15dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:hint="Buscar" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_margin="10dp"
-        android:textSize="15dp"
+        android:textSize="15sp"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:hint="Localizacao"/>

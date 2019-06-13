@@ -1,7 +1,6 @@
-package com.example.whereapplication;
+package com.example.whereapplication.ActivitiesClasses;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,41 +8,29 @@ import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
-import android.provider.DocumentsContract;
-import android.se.omapi.Session;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.Switch;
 import android.widget.Toast;
 
-import com.example.whereapplication.DAO.DAO;
-import com.example.whereapplication.Object.Event;
-import com.firebase.ui.auth.AuthMethodPickerLayout;
+import com.example.whereapplication.Object.FineLocation;
+import com.example.whereapplication.Object.User;
+import com.example.whereapplication.R;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.FacebookAuthCredential;
-import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import org.jsoup.Jsoup;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
 import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.List;
@@ -58,25 +45,31 @@ public class LoginActivity extends AppCompatActivity {
             new AuthUI.IdpConfig.PhoneBuilder().build(),
             new AuthUI.IdpConfig.FacebookBuilder().build());
     public String city;
+    public String country;
     public String notEventFilter;
+    FirebaseDatabase database;
+    DatabaseReference dbReference;
+    User user1;
 
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        dbReference = FirebaseDatabase.getInstance().getReference();
         auth = FirebaseAuth.getInstance();
+        user1 = new User();
         requestPermimssion();
         authListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
+
                 FirebaseUser user = firebaseAuth.getCurrentUser();
+
                 if (user != null) {
-                    Bundle extra = new Bundle();
-                    extra.putString("location",searchable);
-                    extra.putString("city",notEventFilter);
                     Intent intent = new Intent(LoginActivity.this, ListActivity.class);
-                    intent.putExtras(extra);
+                    dbReference.child(user.getUid()).setValue(user1);
                     startActivity(intent);
                 }else {
                     startActivityForResult(
@@ -140,9 +133,7 @@ public class LoginActivity extends AppCompatActivity {
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
 
         } else {
-            Log.i("teste","aaab");
             ActivityCompat.requestPermissions(LoginActivity.this,
-
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     USER_LOCATION
             );
@@ -150,15 +141,11 @@ public class LoginActivity extends AppCompatActivity {
         Geocoder geocoder;
         String bestProvider;
         List<Address> user;
-        double lat;
-        double lng;
         LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
 
         bestProvider = lm.getBestProvider(criteria, false);
         Location location = lm.getLastKnownLocation(bestProvider);
-
-        Log.i("teste",""+location.getLongitude());
         if (location == null) {
             Toast.makeText(this, "Location Not found", Toast.LENGTH_LONG).show();
 
@@ -170,106 +157,129 @@ public class LoginActivity extends AppCompatActivity {
                 Log.i("teste",""+location.getLatitude());
                 user = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),3);
                 Log.i("teste",""+user.get(0).getLatitude());
-                lat = (double) user.get(0).getLatitude();
-
-                lng = (double) user.get(0).getLongitude();
+                country = user.get(0).getCountryCode();
                 city  = user.get(0).getSubAdminArea();
                 state = user.get(0).getAdminArea();
-
-                Log.i("logtest",user.get(0).getAdminArea());
-                switch (state){
-                    case "Acre":
-                        state = "ac";
-                        break;
-                    case "Alagoas":
-                        state = "al";
-                        break;
-                    case "Amapá":
-                        state = "ap";
-                        break;
-                    case "Amazonas":
-                        state = "am";
-                        break;
-                    case "Bahia":
-                        state = "ba";
-                        break;
-                    case "Ceará":
-                        state = "ce";
-                        break;
-                    case "Distrito Federal":
-                        state = "df";
-                        break;
-                    case "Espírito Santo":
-                        state = "es";
-                        break;
-                    case "Goiás":
-                        state = "go";
-                        break;
-                    case "Maranhão":
-                        state = "ma";
-                        break;
-                    case "Mato Grosso":
-                        state = "mt";
-                        break;
-                    case "Mato Grosso do Sul":
-                        state = "ms";
-                        break;
-                    case "Minas Gerais":
-                        state = "mg";
-                        break;
-                    case "Pará":
-                        state = "pa";
-                        break;
-                    case "Paraíba":
-                        state = "pb";
-                        break;
-                    case "Paraná":
-                        state = "pr";
-                        break;
-                    case "Pernambuco":
-                        state ="pe";
-                        break;
-                    case "Piauí":
-                        state = "pi";
-                        break;
-                    case "Rio de Janeiro":
-                        state = "rj";
-                        break;
-                    case "Rio Grande do Norte":
-                        state = "rn";
-                        break;
-                    case "Rio Grande do Sul":
-                        state = "rs";
-                        break;
-                    case "Rondônia":
-                        state = "ro";
-                        break;
-                    case "Roraima":
-                        state = "rr";
-                        break;
-                    case "Santa Catarina":
-                        state = "sc";
-                        break;
-                    case "São Paulo":
-                        state = "sp";
-                        break;
-                    case "Sergipe":
-                        state = "se";
-                        break;
-                    case "Tocantins":
-                        state = "to";
-                            break;
-                }
+                Log.i("logtest",country);
+                state = filterState(state);
                 notEventFilter = city;
-                city = city.replace(" ","-");
-                searchable = city+"-"+state;
-                searchable = removeAccents(searchable);
+                searchable = filterLocation(state,city);
+                FineLocation fineLocation = new FineLocation();
+                fineLocation.setCity(city);
+                fineLocation.setCountry(country);
+                fineLocation.setState(state);
+                user1.setLocation(fineLocation);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
 
+    }
+    public static String filterLocation(String state, String city){
+        state = removeAccents(state);
+        city = removeAccents(city);
+        if (state.length()!=2){
+            state = filterState(state);
+
+        }
+
+        if(city.contains(" ")){
+            city = city.replace(" ","-");
+        }
+        state = state.toUpperCase();
+        String location = city+"-"+state;
+        location = location.replace(" ","-");
+
+        return location;
+    }
+
+    public static String filterState(String state){
+        state = removeAccents(state);
+        switch (state){
+            case "Acre":
+                state = "ac";
+                break;
+            case "Alagoas":
+                state = "al";
+                break;
+            case "Amapa":
+                state = "ap";
+                break;
+            case "Amazonas":
+                state = "am";
+                break;
+            case "Bahia":
+                state = "ba";
+                break;
+            case "Ceara":
+                state = "ce";
+                break;
+            case "Distrito Federal":
+                state = "df";
+                break;
+            case "Espirito Santo":
+                state = "es";
+                break;
+            case "Goias":
+                state = "go";
+                break;
+            case "Maranhao":
+                state = "ma";
+                break;
+            case "Mato Grosso":
+                state = "mt";
+                break;
+            case "Mato Grosso do Sul":
+                state = "ms";
+                break;
+            case "Minas Gerais":
+                state = "mg";
+                break;
+            case "Para":
+                state = "pa";
+                break;
+            case "Paraiba":
+                state = "pb";
+                break;
+            case "Parana":
+                state = "pr";
+                break;
+            case "Pernambuco":
+                state ="pe";
+                break;
+            case "Piaui":
+                state = "pi";
+                break;
+            case "Rio de Janeiro":
+                state = "rj";
+                break;
+            case "Rio Grande do Norte":
+                state = "rn";
+                break;
+            case "Rio Grande do Sul":
+                state = "rs";
+                break;
+            case "Rondonia":
+                state = "ro";
+                break;
+            case "Roraima":
+                state = "rr";
+                break;
+            case "Santa Catarina":
+                state = "sc";
+                break;
+            case "Sao Paulo":
+                state = "sp";
+                break;
+            case "Sergipe":
+                state = "se";
+                break;
+            case "Tocantins":
+                state = "to";
+                break;
+        }
+        return state;
     }
 //    private class Description extends AsyncTask<Void, Void, Void>{
 //        String url = "https://www.sympla.com.br/eventos/"+searchable;

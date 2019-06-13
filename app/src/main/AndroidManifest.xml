@@ -17,12 +17,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        android:theme="@style/Theme.AppCompat.NoActionBar">
 
 
 
-        <activity android:name=".ScrapinActivity"></activity>
-        <activity android:name=".LoginActivity">
+        <activity android:name=".ActivitiesClasses.ScrapinActivity"></activity>
+        <activity android:name=".ActivitiesClasses.LoginActivity">
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -36,9 +36,9 @@
             </intent-filter>
 
         </activity>
-        <activity android:name=".CellActivity" />
-        <activity android:name=".ListActivity" />
-        <activity android:name=".WelcomeActivity" />
+        <activity android:name=".ActivitiesClasses.CellActivity" />
+        <activity android:name=".ActivitiesClasses.ListActivity" />
+        <activity android:name=".ActivitiesClasses.WelcomeActivity" />
     </application>
 
 </manifest>

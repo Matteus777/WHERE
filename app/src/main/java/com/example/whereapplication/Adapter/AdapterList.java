@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.example.whereapplication.Object.Event;
 import com.example.whereapplication.Object.Price;
 import com.example.whereapplication.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -21,7 +22,6 @@ public  class AdapterList extends RecyclerView.Adapter<AdapterList.ViewHolderEve
     public AdapterList(List<Event> dados){
         this.list = dados;
     }
-
 
 
 
@@ -45,6 +45,8 @@ public  class AdapterList extends RecyclerView.Adapter<AdapterList.ViewHolderEve
             viewHolder.tvTitle.setText(event.getTitle());
             viewHolder.tvDate.setText(event.getRealDate().getTime().toString());
             viewHolder.tvLocation.setText(event.getLocal());
+            Log.i("imagem",event.getLocal());
+            Picasso.with(viewHolder.ivImage.getContext()).load( event.getPhoto() ).into( viewHolder.ivImage );
             double menor = 99999999;
             for(int j = 0;j<event.getPrice().size();j++){
                 Object price = event.getPrice().get(j);

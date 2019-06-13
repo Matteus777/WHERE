@@ -3,7 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:backgroundTint="@color/wherePink"
     android:background="#000"
-    tools:context=".LoginActivity">
+    tools:context=".ActivitiesClasses.LoginActivity">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@mipmap/ic_action_icon_menor" />
+
+
+
 
 </RelativeLayout>
