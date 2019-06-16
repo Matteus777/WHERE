@@ -18,23 +18,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
-
-
-
-        <activity android:name=".ActivitiesClasses.ScrapinActivity"></activity>
+        <activity
+            android:name=".NavigationDrawerActivity"
+            android:label="@string/title_activity_navigation_drawer"
+            android:theme="@style/NoActionBar"></activity>
         <activity android:name=".ActivitiesClasses.LoginActivity">
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
-
-
-
-
-
             </intent-filter>
-
         </activity>
         <activity android:name=".ActivitiesClasses.CellActivity" />
         <activity android:name=".ActivitiesClasses.ListActivity" />

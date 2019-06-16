@@ -6,6 +6,15 @@ public class FineLocation {
     private String city;
     private String state;
     private String country;
+    private String photo;
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
 
     public String getAddress() {
         return address;
